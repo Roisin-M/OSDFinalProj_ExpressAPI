@@ -27,7 +27,6 @@ benchmarks/graphs
 node_modules
 
 # build folder
-
 build
 
 #env file

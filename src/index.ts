@@ -1,10 +1,15 @@
 import express, {Application, Request, Response} from "express";
 import instructorRoutes from './routes/instructors';
+import dotenv from "dotenv";
 //import morgan from "morgan";
 
-const PORT = process.env.Port || 3000;
+dotenv.config();
+
+const PORT = process.env.Port || 3001;
 
 const app: Application = express();
+
+app.use(express.json());
 
 //app.use(morgan("tiny"));
 
