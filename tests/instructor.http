@@ -1,15 +1,20 @@
-@endpoint=http:3000/yoga-studio-management-api/v1/instructors
+###
+@endpoint=http://localhost:3000/yoga-studio-management-api/v1/instructors/
 
 # @name postAnInstructor
 POST {{endpoint}} HTTP/1.1
 Content-Type: application/json
 
 {
-  "name": "John Doe",
-  "yogaspecialities": [
-    { "type": "Hatha" }
-  ],
-  "email": "john.doe@example.com"
+  "name": "Alice Smith",
+  "yogaSpecialities": [],
+  "email": "alice.smith@example.com"
 }
+
+###
+
+# @name GETALLINSTRUCTORS
+GET {{endpoint}} HTTP/1.1
+Content-type: application/json 
 
 ###

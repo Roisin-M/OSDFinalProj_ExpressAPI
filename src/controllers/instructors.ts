@@ -1,10 +1,16 @@
-import { Request, response, Response } from "express";
+import { Request, Response } from "express";
 import instructor from "../models/instructor";
 import { instructorsCollection } from "../database";
+import { ObjectId } from "mongodb";
 
 export const getInstructors = async (req: Request, res:Response)=>{
-    //get all instructors from the database
-    res.json({"message":"getInstructors received"})
+    try {
+        // Fetch all instructors from the database
+        const instructors = await instructorsCollection.find({}).toArray();
+        res.status(200).json(instructors);
+    } catch (error) {
+        res.status(500).json({ message: "Unable to fetch instructors." });
+    }
 };
 
 export const getInstructorById =(req:Request,res:Response)=>{
@@ -13,46 +19,32 @@ export const getInstructorById =(req:Request,res:Response)=>{
     res.json({"message": `get instructor ${id} received`})
 };
 
-export const createInstructor=async (req:Request, res:Response)=>{
-    // create a new instructor in the database 
-    try { 
-        //extract instructor data from request body
-        const {name, yogaSpecialities, email}=req.body;
-        // Create a new instructor object
+export const createInstructor = async (req: Request, res: Response) => {
+    try {
+        const { name, yogaSpecialities, email } = req.body;
+
         const newInstructor: instructor = {
-          //...req.body,        // Spread operator to copy properties from the request body
-          name,
-          yogaSpecialities,
-          email,
+            name,
+            yogaSpecialities,
+            email
         };
 
-    
-        //let validateResult : Joi.ValidationResult = ValidateUser(req.body)
-  
-        // if (validateResult.error) {
-        //   res.status(400).json(validateResult.error);
-        //   return;
-        // }     
-  
         const result = await instructorsCollection.insertOne(newInstructor);
-        if (result) { 
-    
-            res.status(201).location(`${result.insertedId}`).json({message : `Created a new instructor with id ${result.insertedId}`})} 
-            else {  
-            res.status(500).send("Failed to create a new instructor."); 
-            } 
-          }
-        
-        catch (error) {  
-          if(error instanceof Error){
-            console.log(`issue with inserting ${error.message}`);
-          } 
-          else{
-            console.log(`error with ${error}`)
-          }
-          res.status(400).send(`Unable to create new instructor`); 
-    } 
+        if (result.insertedId) {
+            res.status(201).location(`/instructors/${result.insertedId}`).json({
+                message: `Created a new instructor with id ${result.insertedId}`
+            });
+        } else {
+            res.status(500).send("Failed to create a new instructor.");
+        }
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error(`Issue with inserting: ${error.message}`);
+            res.status(400).send(`Unable to create new instructor: ${error.message}`);
+        }
+    }
 };
+
 
 export const updateInstructor = (req:Request, res:Response)=>{
     console.log(req.body)
