@@ -40,7 +40,7 @@ export const createInstructor = async (req: Request, res: Response) => {
 
         const result = await instructorsCollection.insertOne(newInstructor);
         if (result.insertedId) {
-            res.status(201).location(`/instructors/${result.insertedId}`).json({
+            res.status(201).location(`${result.insertedId}`).json({
                 message: `Created a new instructor with id ${result.insertedId}`
             });
         } else {
