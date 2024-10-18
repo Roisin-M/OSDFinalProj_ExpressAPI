@@ -1,7 +1,26 @@
-###
-@endpoint=http://localhost:3000/yoga-studio-management-api/v1/instructors/
+@endpoint=http://localhost:3000/yoga-studio-management-api/v1/instructors
 
 # @name postAnInstructor
+POST {{endpoint}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "yogaSpecialities": ["Hatha", "Vinyasa"],
+  "email": "john.doe@example.com"
+}
+###
+
+### get user by id
+GET {{endpoint}} HTTP/1.1
+
+###
+# @name GETALLINSTRUCTORS
+GET {{endpoint}} HTTP/1.1
+Content-type: application/json 
+
+###
+# @name postAnInstructorWithEmptyArray
 POST {{endpoint}} HTTP/1.1
 Content-Type: application/json
 
@@ -10,11 +29,15 @@ Content-Type: application/json
   "yogaSpecialities": [],
   "email": "alice.smith@example.com"
 }
-
 ###
 
-# @name GETALLINSTRUCTORS
-GET {{endpoint}} HTTP/1.1
-Content-type: application/json 
+DELETE {{endpoint}}/671247ad4dcac407f098f88
+Content-Type: application/json
 
-###
+### update of the instructor
+PUT {{endpoint}}/670ece153c77ae61fda4d939 HTTP/1.1
+Content-Type: application/json
+
+{
+  "yogaSpecialities": ["Hatha"]
+}
