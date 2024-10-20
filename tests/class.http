@@ -1,0 +1,171 @@
+# Base URL for the API
+@endpoint=http://localhost:3000/yoga-studio-management-api/v1/classes
+
+# 1. POST - Create a Valid Class (Success)
+# @name postValidClass
+POST {{endpoint}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "instructorId": "instructor123",
+  "description": "Intermediate Vinyasa class focusing on flexibility.",
+  "classLocationId": "location123",
+  "date": "15-10-2024",
+  "startTime": "10:00",
+  "endTime": "11:30",
+  "level": ["Intermediate"],
+  "type": ["Vinyasa", "Hatha"],
+  "category": ["Flexibility", "Strength"],
+  "classFormat": "Both",
+  "spacesAvailable": 20
+}
+###
+# Capture the location header from the response to get the ID of the newly created class
+@ClassID = {{postValidClass.response.headers.location}}
+
+# 2. POST - Create a Class (Missing Required Fields)
+# @name postClassMissingFields
+POST {{endpoint}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "instructorId": "instructor456",
+  "date": "16-10-2024",
+  "startTime": "12:00",
+  "endTime": "13:00"
+}
+###
+
+# 3. POST - Create a Class (Invalid Date Format)
+# @name postClassInvalidDate
+POST {{endpoint}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "instructorId": "instructor789",
+  "description": "Beginner class with focus on balance.",
+  "classLocationId": "location789",
+  "date": "2024-10-16",  
+  "startTime": "08:00",
+  "endTime": "09:00",
+  "level": ["Beginner"],
+  "type": ["Hatha"],
+  "category": ["Balance"],
+  "classFormat": "Location",
+  "spacesAvailable": 10
+}
+###
+
+# 4. GET - Retrieve Class by ID (Using ClassID from POST response)
+# @name GetClassByID
+GET {{endpoint}}/{{ClassID}} HTTP/1.1
+###
+
+# 5. GET - Retrieve All Classes
+# @name GetAllClasses
+GET {{endpoint}} HTTP/1.1
+Content-Type: application/json
+###
+
+# 6. DELETE - Delete Class by ID (Using ClassID captured from POST request)
+# @name DeleteClass
+DELETE {{endpoint}}/{{ClassID}} HTTP/1.1
+Content-Type: application/json
+###
+
+# 7. Capture the First Class's ID from the list of all classes
+@FirstClassID = {{GetAllClasses.response.body.$[0]._id}}
+
+# 8. PUT - Update Class Description and Time (Using FirstClassID)
+# @name UpdateClassDescriptionAndTime
+PUT {{endpoint}}/{{FirstClassID}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "description": "Updated description for beginner class.",
+  "startTime": "09:00",
+  "endTime": "10:00"
+}
+###
+
+# 9. GET - Retrieve First Class by ID (Using FirstClassID)
+# @name GetFirstClassByID
+GET {{endpoint}}/{{FirstClassID}} HTTP/1.1
+###
+
+# 10. DELETE - Delete the first class in the list of all classes
+# @name DeleteFirstClass
+DELETE {{endpoint}}/{{FirstClassID}} HTTP/1.1
+Content-Type: application/json
+###
+
+# 11. GET - Try to Retrieve a Non-Existent Class (Invalid ID)
+# @name GetNonExistentClass
+GET {{endpoint}}/nonexistentID HTTP/1.1
+Content-Type: application/json
+###
+
+# 12. POST - Create Another Class 
+# @name postAnotherClass
+POST {{endpoint}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "instructorId": "instructor789",
+  "description": "Beginner Yoga Class focusing on relaxation.",
+  "classLocationId": "location456",
+  "date": "17-10-2024",
+  "startTime": "14:00",
+  "endTime": "15:00",
+  "level": ["Beginner"],
+  "type": ["Restorative"],
+  "category": ["Relaxation", "Balance"],
+  "classFormat": "Stream",
+  "spacesAvailable": 25
+}
+###
+# Capture the new class ID from the response location header (direct ObjectId)
+@AnotherClassID = {{postAnotherClass.response.headers.location}}
+
+# 13. GET - Retrieve Another Class by ID (Using AnotherClassID)
+# @name GetAnotherClassByID
+GET {{endpoint}}/{{AnotherClassID}} HTTP/1.1
+###
+
+# 14. GET - Retrieve All Classes with "Stream" Class Format
+# @name GetClassesWithStreamFormat
+GET {{endpoint}}?filter={"classFormat":"Stream"} HTTP/1.1
+Content-Type: application/json
+###
+
+# 15. GET - Retrieve Paginated Classes (Page 1, 2 per page)
+# @name GetPaginatedClasses
+GET {{endpoint}}?page=1&pageSize=2
+Content-Type: application/json
+###
+
+# 16. GET - Retrieve All Classes with "Intermediate" Level
+# @name GetClassesWithIntermediateLevel
+GET {{endpoint}}?filter={"level":"Intermediate"} HTTP/1.1
+Content-Type: application/json
+###
+
+# 17. POST - Create a Class with Invalid Time (Invalid Format)
+# @name postClassInvalidTime
+POST {{endpoint}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "instructorId": "instructor567",
+  "description": "Advanced class with focus on strength.",
+  "classLocationId": "location567",
+  "date": "20-10-2024",
+  "startTime": "24:00",  
+  "endTime": "25:00",  
+  "level": ["Advanced"],
+  "type": ["Power Yoga"],
+  "category": ["Strength"],
+  "classFormat": "Both",
+  "spacesAvailable": 15
+}
+###
