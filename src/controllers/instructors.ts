@@ -6,8 +6,13 @@ import Joi from "joi";
 
 export const getInstructors = async (req: Request, res:Response)=>{
     try {
+
+        //allow filter searching
+        const {filter}=req.query;
+        const filterobj=filter?JSON.parse(filter as string):{};
+
         // Fetch all instructors from the database
-        const instructors = await instructorsCollection.find({}).toArray();
+        const instructors = await instructorsCollection.find(filterobj).toArray() as Instructor[];
         res.status(200).json(instructors);
     } catch (error) {
         res.status(500).json({ message: "Unable to fetch instructors." });
