@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import ClassLocation from "../models/classLocation";
+import ClassLocation, { ValidateClassLocation } from "../models/classLocation";
 import { classLocationsCollection, instructorsCollection } from "../database";
 import { ObjectId } from "mongodb";
+import Joi from "joi";
 
 //get all class locations
 export const getClassLocations = async (req: Request, res:Response)=>{
@@ -60,6 +61,14 @@ export const createClassLocation = async (req: Request, res: Response) => {
             location,
             classFormats,
         };
+
+        // Validate the instructor data
+        let validateResult: Joi.ValidationResult = ValidateClassLocation(req.body);
+
+        if (validateResult.error) {
+            res.status(400).json(validateResult.error);
+            return;
+        }
 
         // Insert the new class Location into the database
         const result = await classLocationsCollection.insertOne(newClassLocation);
