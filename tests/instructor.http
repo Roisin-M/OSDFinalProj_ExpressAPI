@@ -132,3 +132,9 @@ GET {{endpoint}}?filter={"yogaSpecialities":{"$all":["Hatha","Vinyasa"],"$size":
 # @name GetInstructorsWithEitherHathaOrVinyasa
 GET {{endpoint}}?filter={"yogaSpecialities":{"$in":["Hatha","Vinyasa"]}}
 ###
+
+# 18. GET - Retrieve paginated instructors with page 3 and pageSize 5
+# @name GetPaginatedInstructors
+GET {{endpoint}}?page=5&pageSize=5
+Content-Type: application/json
+###

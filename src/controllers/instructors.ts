@@ -4,6 +4,7 @@ import { instructorsCollection } from "../database";
 import { ObjectId } from "mongodb";
 import Joi from "joi";
 
+//get all instructors
 export const getInstructors = async (req: Request, res:Response)=>{
     try {
 
@@ -11,8 +12,21 @@ export const getInstructors = async (req: Request, res:Response)=>{
         const {filter}=req.query;
         const filterobj=filter?JSON.parse(filter as string):{};
 
+        //GET allow paging
+        const page = parseInt(req.query.page as string,10) || 1;
+        const pageSize = parseInt(req.query.pageSize as string,0) || 0;
+
         // Fetch all instructors from the database
-        const instructors = await instructorsCollection.find(filterobj).toArray() as Instructor[];
+        //filtering enabled
+        //project - don't include object id
+        //sorting by name is ascending / alphabetical order
+        const instructors = await instructorsCollection
+        .find(filterobj)
+        .project({'_id':0})
+        .sort({'name':1})
+        .skip((page-1)*pageSize)
+        .limit(pageSize)
+        .toArray() as Instructor[];
         res.status(200).json(instructors);
     } catch (error) {
         res.status(500).json({ message: "Unable to fetch instructors." });
