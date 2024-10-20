@@ -19,7 +19,7 @@ export const getInstructors = async (req: Request, res:Response)=>{
         // Fetch all instructors from the database
         //filtering enabled
         //project - don't include object id
-        //sorting by name is ascending / alphabetical order
+        //sorting by name in ascending / alphabetical order
         const instructors = await instructorsCollection
         .find(filterobj)
         .project({'_id':0})
@@ -125,7 +125,7 @@ export const deleteInstructor =async (req:Request,res:Response)=>{
             res.status(202).json({message : `succesfully removed instructor with id 
                 ${id}`});
         }else if(!result){
-            res.status(400).json({message: `failed to remove user with id
+            res.status(400).json({message: `failed to remove instructor with id
                 ${id}`});
         }else if(!result.deletedCount){
             res.status(404).json({message : `no instructor found with id
