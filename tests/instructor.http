@@ -37,13 +37,13 @@ Content-Type: application/json
 }
 ###
 
-# 4. POST - Create a Valid Instructor (Success)
+# 4. POST - Create a Valid Instructor (Success) --> testing one to many relationship
 # @name postValidInstructor
 POST {{endpoint}} HTTP/1.1
 Content-Type: application/json
 
 {
-  "name": "John Doe",
+  "name": "Testing Relationship",
   "yogaSpecialities": ["Ashtanga", "Bikram"],
   "email": "john.doe@example.com"
 }
@@ -136,5 +136,11 @@ GET {{endpoint}}?filter={"yogaSpecialities":{"$in":["Hatha","Vinyasa"]}}
 # 18. GET - Retrieve paginated instructors with page 3 and pageSize 5
 # @name GetPaginatedInstructors
 GET {{endpoint}}?page=5&pageSize=5
+Content-Type: application/json
+###
+
+# get classes for an instructor
+# @name GetClassesForAnInstructor
+GET {{endpoint}}/673b81982ffa0fbbc33f94a5
 Content-Type: application/json
 ###

@@ -53,7 +53,7 @@ export enum ClassFormat {
 // Interface for Class Model
 export default interface Class {
     id?: ObjectId;
-    instructorId: string; // Keeping it as a string for now without linking to Instructor collection
+    instructorId: ObjectId; // Reference to the Instructor for one-to many relationship
     description: string;
     classLocationId: string; // Keeping it as a string for now without linking to Class Location collection
     date: string; // Date in dd-mm-yyyy format

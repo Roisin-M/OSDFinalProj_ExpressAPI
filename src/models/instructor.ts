@@ -30,6 +30,7 @@ export default interface Instructor{
     yogaSpecialities :YogaSpeciality[];
     email:string;
     id?: ObjectId;
+    classIds?: ObjectId[]; // Array of Class IDs (references to classes) for one-to many relationship
 }
 
 // create an array of valid values from YogaSpeciality enum

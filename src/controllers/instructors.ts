@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Instructor, { ValidateInstructor } from "../models/instructor";
-import { instructorsCollection } from "../database";
+import { classesCollection, instructorsCollection } from "../database";
 import { ObjectId } from "mongodb";
 import Joi from "joi";
 
@@ -33,6 +33,7 @@ export const getInstructors = async (req: Request, res:Response)=>{
     }
 };
 
+//get instructor by id and their array of classes
 export const getInstructorById = async (req:Request,res:Response)=>{
     //get a single instructor by ID from database
     let id:string = req.params.id;
@@ -40,7 +41,9 @@ export const getInstructorById = async (req:Request,res:Response)=>{
         const query = {_id: new ObjectId(id)};
         const instructor = (await instructorsCollection.findOne(query)) as Instructor;
         if(instructor){
-            res.status(200).send(instructor);
+            // Fetch associated classes
+            const classes = await classesCollection.find({ instructorId: query}).toArray();
+            res.status(200).json({instructor, classes});
         }
     } catch{
         res.status(404).send(`Unable to find matching document with id :

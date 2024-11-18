@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Class, {ValidateClass} from "../models/class";
-import { classesCollection } from "../database";
+import { classesCollection, instructorsCollection } from "../database";
 import { ObjectId } from "mongodb";
 import Joi from "joi";
 
@@ -52,7 +52,7 @@ export const createClass = async (req: Request, res: Response) => {
 
         // Create a new class object
         const newClass: Class = {
-            instructorId,  // No linking to instructor yet
+            instructorId: new ObjectId(instructorId),  // No linking to instructor yet
             description,
             classLocationId,  // No linking to class location yet
             date,
@@ -76,6 +76,11 @@ export const createClass = async (req: Request, res: Response) => {
         // Insert the new class into the database
         const result = await classesCollection.insertOne(newClass);
         if (result.insertedId) {
+            //link the new class to the instructor
+            await instructorsCollection.updateOne(
+                {_id: new ObjectId(instructorId)},
+                {$push: {classIds: result.insertedId}}
+            );
             res.status(201).location(`${result.insertedId}`).json({
                 message: `Created a new class with id ${result.insertedId}`,
             });
