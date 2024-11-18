@@ -13,6 +13,7 @@ export default interface ClassLocation{
     maxCapacity: number;
     location: string;
     classFormats: ClassFormat[];
+    classIDs?:ObjectId[]; // Array of Class IDs (references to classes) for one-to many relationship
 }
 
 // create an array of valid values from Class Format enum

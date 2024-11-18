@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Class, {ValidateClass} from "../models/class";
-import { classesCollection, instructorsCollection } from "../database";
+import { classesCollection, classLocationsCollection, instructorsCollection } from "../database";
 import { ObjectId } from "mongodb";
 import Joi from "joi";
 
@@ -10,6 +10,14 @@ export const getClasses = async (req: Request, res: Response) => {
         // Allow filtering
         const { filter } = req.query;
         const filterObj = filter ? JSON.parse(filter as string) : {};
+
+         // Convert string IDs to ObjectId if necessary
+         if (filterObj.instructorId) {
+            filterObj.instructorId = new ObjectId(filterObj.instructorId);
+        }
+        if (filterObj.classLocationId) {
+            filterObj.classLocationId = new ObjectId(filterObj.classLocationId);
+        }
 
         // Allow pagination
         const page = parseInt(req.query.page as string, 10) || 1;
@@ -65,11 +73,18 @@ export const createClass = async (req: Request, res: Response) => {
             return;
         }
 
+        // check that classLocationID exists in classLocation model
+        const classLocationExists = await classLocationsCollection.findOne({ _id: new ObjectId(classLocationId) });
+        if (!classLocationExists) {
+            res.status(404).json({message: `No class Location found with class Location id ${instructorId}`});
+            return;
+        }
+
         // Create a new class object
         const newClass: Class = {
-            instructorId: new ObjectId(instructorId),  // No linking to instructor yet
+            instructorId: new ObjectId(instructorId), 
             description,
-            classLocationId,  // No linking to class location yet
+            classLocationId: new ObjectId(classLocationId),  
             date,
             startTime,
             endTime,
@@ -88,6 +103,11 @@ export const createClass = async (req: Request, res: Response) => {
                 {_id: new ObjectId(instructorId)},
                 {$push: {classIds: result.insertedId}}
             );
+            //link the new class to the class Location
+            await classLocationsCollection.updateOne(
+                {_id: new ObjectId(classLocationId)},
+                {$push: {classIDs: result.insertedId}}
+            )
             res.status(201).location(`${result.insertedId}`).json({
                 message: `Created a new class with id ${result.insertedId}`,
             });
@@ -141,6 +161,11 @@ export const deleteClass = async (req: Request, res: Response) => {
             //remove class reference from the instructor
             await instructorsCollection.updateOne(
                 {_id: new ObjectId(result?.instructorId)},
+                {$pull:{classIds:new ObjectId(id)}}
+            );
+            //remove class reference from the class Location
+            await classLocationsCollection.updateOne(
+                {_id: new ObjectId(result?.classLocationId)},
                 {$pull:{classIds:new ObjectId(id)}}
             );
             res.status(202).json({ message: `Successfully removed class with id ${id}` });

@@ -55,7 +55,7 @@ export default interface Class {
     id?: ObjectId;
     instructorId: ObjectId; // Reference to the Instructor for one-to many relationship
     description: string;
-    classLocationId: string; // Keeping it as a string for now without linking to Class Location collection
+    classLocationId: ObjectId; // Reference to the Class Location for one-to many relationship
     date: string; // Date in dd-mm-yyyy format
     startTime: string; // Time in 24 hour format
     endTime: string;   // Time in 24 hour format
@@ -79,13 +79,18 @@ const timePattern = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/
 export const ValidateClass = (classObj: Class) => {
     const classJoiSchema = Joi.object<Class>({
         instructorId: Joi.string().custom((value, helpers) => {
-            if (!ObjectId.isValid(value)) {//checks if the value is a valid MongoDB  ObjectId
+            if (!ObjectId.isValid(value)) {//checks if the value is a valid MongoDB ObjectId
                 return helpers.error("invalid instructor ID", { value });//custom error message
             }
             return value;
         }).required(), // Instructor ID is required
         description: Joi.string().min(10).required(), // Description must be at least 10 characters and required
-        classLocationId: Joi.string().required(), // Class Location ID is required
+        classLocationId: Joi.string().custom((value, helpers) => {
+            if (!ObjectId.isValid(value)) {//checks if the value is a valid MongoDB ObjectId
+                return helpers.error("invalid class Loaction ID", { value });
+            }
+            return value;
+        }).required(), // Class Location ID is required
         date: Joi.string().pattern(datePattern).required(), // Date must be in dd-mm-yyyy format
         startTime: Joi.string().pattern(timePattern).required(), // Start Time in 24-hour format HH:mm
         endTime: Joi.string().pattern(timePattern).required(), // End Time in 24-hour format HH:mm

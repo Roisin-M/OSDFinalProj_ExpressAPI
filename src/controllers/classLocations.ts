@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import ClassLocation, { ValidateClassLocation } from "../models/classLocation";
-import { classLocationsCollection, instructorsCollection } from "../database";
+import { classesCollection, classLocationsCollection, instructorsCollection } from "../database";
 import { ObjectId } from "mongodb";
 import Joi from "joi";
 
@@ -32,7 +32,7 @@ export const getClassLocations = async (req: Request, res:Response)=>{
         res.status(500).json({ message: "Unable to fetch class locations." });
     }
 };
-
+//get class location by id and its associated array of class ids
 export const getClassLocationsById = async (req:Request,res:Response)=>{
     //get a single class Location by ID from database
     let id:string = req.params.id;
@@ -40,7 +40,9 @@ export const getClassLocationsById = async (req:Request,res:Response)=>{
         const query = {_id: new ObjectId(id)};
         const classLocation = (await classLocationsCollection.findOne(query)) as ClassLocation;
         if(classLocation){
-            res.status(200).send(classLocation);
+            //fetch associated classes
+            const classes = await classesCollection.find({classLocationId: query}).toArray();
+            res.status(200).json({classLocation, classes});
         }
     } catch{
         res.status(404).send(`Unable to find matching document with id :

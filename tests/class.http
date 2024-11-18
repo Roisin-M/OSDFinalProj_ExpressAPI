@@ -105,7 +105,7 @@ GET {{endpoint}}/nonexistentID HTTP/1.1
 Content-Type: application/json
 ###
 
-# 12. POST - Create Another Class --> test instructor relationship
+# 12. POST - Create Another Class 
 # @name postAnotherClass
 POST {{endpoint}} HTTP/1.1
 Content-Type: application/json
@@ -175,7 +175,87 @@ Content-Type: application/json
 DELETE {{endpoint}}/673ba31ca1c3dee917e77d59
 ###
 
-# 19. GET - get the class by id with the instructor reference
-# @name getByIdClassThatHasInstructorRef
-GET {{endpoint}}/673ba31ca1c3dee917e77d59
+# 19. POST - Create a Class with Valid Instructor and Class Location (One-to-Many Relationship)
+# @name postClassWithValidInstructorAndLocation
+POST {{endpoint}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "instructorId": "673b81982ffa0fbbc33f94a5",  
+  "description": "Morning Yoga Flow",
+  "classLocationId": "673bb9ee38794facb74217af", 
+  "date": "22-11-2024",
+  "startTime": "07:00",
+  "endTime": "08:30",
+  "level": ["Beginner"],
+  "type": ["Hatha"],
+  "category": ["Balance"],
+  "classFormat": "Both",
+  "spacesAvailable": 15
+}
+###
+# Capture the class ID from the response location header
+@CreatedClassID = {{postClassWithValidInstructorAndLocation.response.headers.location}}
+
+# 20. GET - Retrieve the Class by ID (Ensure it's linked with Instructor and Location)
+# @name getCreatedClassByID
+GET {{endpoint}}/{{CreatedClassID}} HTTP/1.1
+###
+
+# 21. GET - Retrieve All Classes for a Specific Instructor
+# @name getAllClassesForInstructor
+GET {{endpoint}}?filter={"instructorId":"673b81982ffa0fbbc33f94a5"} HTTP/1.1
+Content-Type: application/json
+###
+
+# 22. GET - Retrieve All Classes for a Specific Location
+# @name getAllClassesForLocation
+GET {{endpoint}}?filter={"classLocationId":"673bb9ee38794facb74217af"} HTTP/1.1
+Content-Type: application/json
+###
+
+# 23. POST - Attempt to Create a Class with Invalid Instructor ID
+# @name postClassWithInvalidInstructorID
+POST {{endpoint}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "instructorId": "invalidObjectId123",
+  "description": "Evening Stretch Class",
+  "classLocationId": "673bb9ee38794facb74217af",
+  "date": "22-11-2024",
+  "startTime": "18:00",
+  "endTime": "19:00",
+  "level": ["Intermediate"],
+  "type": ["Yin"],
+  "category": ["Relaxation"],
+  "classFormat": "Location",
+  "spacesAvailable": 10
+}
+###
+
+# 24. POST - Attempt to Create a Class with Invalid Class Location ID
+# @name postClassWithInvalidLocationID
+POST {{endpoint}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "instructorId": "673b81982ffa0fbbc33f94a5",
+  "description": "Power Yoga for Strength",
+  "classLocationId": "invalidObjectId456",
+  "date": "22-11-2024",
+  "startTime": "09:00",
+  "endTime": "10:30",
+  "level": ["Advanced"],
+  "type": ["PowerYoga"],
+  "category": ["Strength"],
+  "classFormat": "Stream",
+  "spacesAvailable": 20
+}
+###
+
+# 25. DELETE - Delete Class by ID (Using CreatedClassID)
+# @name deleteCreatedClass
+DELETE {{endpoint}}/{{CreatedClassID}} HTTP/1.1
+Content-Type: application/json
 ###
