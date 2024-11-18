@@ -112,7 +112,7 @@ Content-Type: application/json
 
 {
   "instructorId": "673b81982ffa0fbbc33f94a5",
-  "description": "testing one-to-many relationship",
+  "description": "test one-to-many relationship",
   "classLocationId": "location456",
   "date": "17-10-2024",
   "startTime": "14:00",
@@ -172,10 +172,10 @@ Content-Type: application/json
 
 # 18. DELETE - delete a class and it's instructor reference
 # @name deleteClassAndInstructorReference
-DELETE {{endpoint}}/673b92136e1b792c429c65d1
+DELETE {{endpoint}}/673ba31ca1c3dee917e77d59
 ###
 
 # 19. GET - get the class by id with the instructor reference
 # @name getByIdClassThatHasInstructorRef
-GET {{endpoint}}/673b92136e1b792c429c65d1
+GET {{endpoint}}/673ba31ca1c3dee917e77d59
 ###

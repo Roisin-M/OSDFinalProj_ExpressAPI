@@ -50,6 +50,21 @@ export const createClass = async (req: Request, res: Response) => {
 
         } = req.body;
 
+        // Validate the class data
+        let validateResult: Joi.ValidationResult = ValidateClass(req.body);
+
+        if (validateResult.error) {
+            res.status(400).json(validateResult.error);
+            return;
+        }
+
+        // check that instructorID exists in instructor model
+        const instructorExists = await instructorsCollection.findOne({ _id: new ObjectId(instructorId) });
+        if (!instructorExists) {
+            res.status(404).json({message: `No instructor found with instructor id ${instructorId}`});
+            return;
+        }
+
         // Create a new class object
         const newClass: Class = {
             instructorId: new ObjectId(instructorId),  // No linking to instructor yet
@@ -64,14 +79,6 @@ export const createClass = async (req: Request, res: Response) => {
             classFormat, // Class format like Location, Stream, Both
             spacesAvailable // number of available spaces
         };
-
-          // Validate the class data
-          let validateResult: Joi.ValidationResult = ValidateClass(req.body);
-
-          if (validateResult.error) {
-              res.status(400).json(validateResult.error);
-              return;
-          }
 
         // Insert the new class into the database
         const result = await classesCollection.insertOne(newClass);

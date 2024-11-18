@@ -78,7 +78,12 @@ const timePattern = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/
 // Joi validation schema for Class
 export const ValidateClass = (classObj: Class) => {
     const classJoiSchema = Joi.object<Class>({
-        instructorId: Joi.string().required(), // Instructor ID is required
+        instructorId: Joi.string().custom((value, helpers) => {
+            if (!ObjectId.isValid(value)) {//checks if the value is a valid MongoDB  ObjectId
+                return helpers.error("invalid instructor ID", { value });//custom error message
+            }
+            return value;
+        }).required(), // Instructor ID is required
         description: Joi.string().min(10).required(), // Description must be at least 10 characters and required
         classLocationId: Joi.string().required(), // Class Location ID is required
         date: Joi.string().pattern(datePattern).required(), // Date must be in dd-mm-yyyy format
