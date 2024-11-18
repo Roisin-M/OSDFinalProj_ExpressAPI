@@ -122,16 +122,26 @@ export const deleteClass = async (req: Request, res: Response) => {
     let id: string = req.params.id;
     try {
         const query = { _id: new ObjectId(id) };
-        const result = await classesCollection.deleteOne(query);
+        const result = await classesCollection.findOne(query);
 
-        if (result && result.deletedCount) {
-            res.status(202).json({ message: `Successfully removed class with id ${id}` });
-        } else if (!result) {
-            res.status(400).json({ message: `Failed to remove class with id ${id}` });
-        } else if (!result.deletedCount) {
+        if(!result){
             res.status(404).json({ message: `No class found with id ${id}` });
         }
+
+        const deleteResult=await classesCollection.deleteOne(query);
+
+        if (deleteResult.deletedCount) {
+            //remove class reference from the instructor
+            await instructorsCollection.updateOne(
+                {_id: new ObjectId(result?.instructorId)},
+                {$pull:{classIds:new ObjectId(id)}}
+            );
+            res.status(202).json({ message: `Successfully removed class with id ${id}` });
+        } else{
+            res.status(400).json({ message: `Failed to remove class with id ${id}` });
+        }
     } catch (error) {
-        res.status(400).send(error);
+        res.status(500).json({message:"Error deleting class", error});
     }
 };
+
