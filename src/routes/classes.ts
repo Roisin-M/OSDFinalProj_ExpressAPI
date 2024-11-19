@@ -3,7 +3,7 @@ import {
     getClasses,
     getClassById,
     createClass,
-    updateClass,
+    updateClassPut,
     deleteClass,
     updateClassPatch
  } from '../controllers/classes';
@@ -12,7 +12,7 @@ import {
 router.get('/',getClasses);
 router.get('/:id',getClassById);
 router.post('/',createClass);
-router.put('/:id',updateClass);
+router.put('/:id',updateClassPut);
 router.patch('/:id', updateClassPatch);
 router.delete('/:id',deleteClass);
 

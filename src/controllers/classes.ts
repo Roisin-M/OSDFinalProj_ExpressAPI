@@ -19,6 +19,12 @@ export const getClasses = async (req: Request, res: Response) => {
             filterObj.classLocationId = new ObjectId(filterObj.classLocationId);
         }
 
+        // Handle date filtering
+        if (filterObj.date) {
+            if (filterObj.date.$gte) filterObj.date.$gte = new Date(filterObj.date.$gte);
+            if (filterObj.date.$lte) filterObj.date.$lte = new Date(filterObj.date.$lte);
+        }
+
         // Allow pagination
         const page = parseInt(req.query.page as string, 10) || 1;
         const pageSize = parseInt(req.query.pageSize as string, 0) || 0;
@@ -31,6 +37,7 @@ export const getClasses = async (req: Request, res: Response) => {
             .toArray() as Class[];
         res.status(200).json(classes);
     } catch (error) {
+        console.error("Error fetching classes:", error);
         res.status(500).json({ message: "Unable to fetch classes." });
     }
 };
@@ -119,28 +126,49 @@ export const createClass = async (req: Request, res: Response) => {
     }
 };
 
-// Update a class with PUT
-export const updateClass = async (req: Request, res: Response) => {
-    let id: string = req.params.id;
-    const updatedClass = req.body as Partial<Class>; // Partial allows updating only a subset of fields
-
-    try {
-        const query = { _id: new ObjectId(id) };
-        const update = { $set: updatedClass }; // $set will only update the provided fields
-
-        const result = await classesCollection.updateOne(query, update);
-
-        if (result.matchedCount > 0) {
-            if (result.modifiedCount > 0) {
-                res.status(200).json({ message: `Successfully updated class with id ${id}` });
-            } else {
-                res.status(200).json({ message: `No changes made to class with id ${id}` });
-            }
-        } else {
-            res.status(404).json({ message: `No class found with id ${id}` });
+export const updateClassPut = async(req:Request, res:Response)=>{
+    let id: string=req.params.id;
+    try{
+        // Validate ObjectId is a valid mongoDb object
+        if (!ObjectId.isValid(id)) {
+            res.status(400).json({ message: "Invalid class ID format" });
+            return;
         }
-    } catch (error) {
-        res.status(500).send(`Error updating class with id ${id}`);
+
+        //check the request body has all required fields for update
+        const updatedClass = req.body as Class;
+
+        //validate all fields exist
+        if(
+            !updatedClass.instructorId ||
+            !updatedClass.description ||
+            !updatedClass.classLocationId ||
+            !updatedClass.date ||
+            !updatedClass.startTime ||
+            !updatedClass.endTime ||
+            !updatedClass.level ||
+            !updatedClass.type ||
+            !updatedClass.category ||
+            !updatedClass.classFormat ||
+            updatedClass.spacesAvailable === undefined
+        ){
+            res.status(400).json({ message: "All fields must be provided for a PUT update." });
+            return;
+        }
+        //apply update
+        const result = await classesCollection.replaceOne(
+            {_id: new ObjectId(id)},
+            updatedClass
+        );
+        //error handling
+        if (result.modifiedCount > 0) {
+            res.status(200).json({ message: `Successfully updated class with id ${id}` });
+        } else {
+            res.status(200).json({ message: `No changes made to class with id ${id}` });
+        }
+    }catch(error){
+        console.error("Error updating class:", error);
+        res.status(500).json({ message: "An error occurred while trying to update the class with PUT operation." });
     }
 };
 
@@ -160,14 +188,10 @@ export const updateClassPatch = async (req: Request, res: Response)=>{
             {_id: new ObjectId(id)},
             {$set: updates}
         );
-        if (result.matchedCount > 0) {
-            if (result.modifiedCount > 0) {
-                res.status(200).json({ message: `Successfully updated class with id ${id}` });
-            } else {
-                res.status(200).json({ message: `No changes made to class with id ${id}` });
-            }
+        if (result.modifiedCount > 0) {
+            res.status(200).json({ message: `Successfully updated class with id ${id}` });
         } else {
-            res.status(404).json({ message: `No class found with id ${id}` });
+            res.status(200).json({ message: `No changes made to class with id ${id}` });
         }
     }catch(error){
         console.error("Error updating class:", error);
