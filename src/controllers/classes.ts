@@ -82,10 +82,10 @@ export const createClass = async (req: Request, res: Response) => {
 
         // Create a new class object
         const newClass: Class = {
-            instructorId: new ObjectId(instructorId), 
+            instructorId: new ObjectId(instructorId), //convert string to ObjectID
             description,
-            classLocationId: new ObjectId(classLocationId),  
-            date,
+            classLocationId: new ObjectId(classLocationId), //convert string to OBjectID 
+            date:new Date(date), // Convert string to Date
             startTime,
             endTime,
             level,   // Class levels like Beginner, Intermediate

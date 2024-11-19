@@ -56,9 +56,9 @@ export default interface Class {
     instructorId: ObjectId; // Reference to the Instructor for one-to many relationship
     description: string;
     classLocationId: ObjectId; // Reference to the Class Location for one-to many relationship
-    date: string; // Date in dd-mm-yyyy format
-    startTime: string; // Time in 24 hour format
-    endTime: string;   // Time in 24 hour format
+    date: Date; //type date (day only)
+    startTime: string; //hh:mm string in 24 hour format
+    endTime: string;  //hh:mm string in 24 hour format
     level: ClassLevel[]; // Array of class levels (e.g., Beginner, Intermediate, Advanced)
     type: YogaSpeciality[]; // Array of yoga specialities (reusing YogaSpeciality enum)
     category: ClassCategory[]; // Array of class categories (focus of the class)
@@ -72,7 +72,7 @@ const classCategoryValues = Object.values(ClassCategory);
 const classFormatValues = Object.values(ClassFormat);
 const yogaSpecialityValues = Object.values(YogaSpeciality);
 
-const datePattern = /^(0[1-9]|[12][0-9]|3[01])(\/|-)(0[1-9]|1[0-2])(\/|-)(19|20)\d{2}$/;
+//const datePattern = /^(0[1-9]|[12][0-9]|3[01])(\/|-)(0[1-9]|1[0-2])(\/|-)(19|20)\d{2}$/;
 const timePattern = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/
 
 // Joi validation schema for Class
@@ -91,9 +91,25 @@ export const ValidateClass = (classObj: Class) => {
             }
             return value;
         }).required(), // Class Location ID is required
-        date: Joi.string().pattern(datePattern).required(), // Date must be in dd-mm-yyyy format
+        date: Joi.date().iso().required(), //validate date type as date and iso
         startTime: Joi.string().pattern(timePattern).required(), // Start Time in 24-hour format HH:mm
-        endTime: Joi.string().pattern(timePattern).required(), // End Time in 24-hour format HH:mm
+        endTime: Joi.string()
+        .pattern(timePattern)
+            .required()
+            .custom((value, helpers) => {
+                const startTime = helpers.state.ancestors[0].startTime;
+                if (startTime && startTime >= value) {
+                    return helpers.error("any.invalid", {
+                        startTime,
+                        endTime: value,
+                    });
+                }
+                return value;
+            })
+            .messages({
+                "string.pattern.base": "End time must be in HH:mm 24-hour format",
+                "any.invalid": "End time must be after start time",
+            }), // End Time in 24-hour format HH:mm, required and greater than startTime
         level: Joi.array()
             .items(Joi.string().valid(...classLevelValues))
             .min(1)
