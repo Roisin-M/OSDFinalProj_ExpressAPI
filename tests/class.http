@@ -259,3 +259,65 @@ Content-Type: application/json
 DELETE {{endpoint}}/{{CreatedClassID}} HTTP/1.1
 Content-Type: application/json
 ###
+
+# 26. PATCH - Update Class Description (Partial Update)
+# @name patchUpdateClassDescription
+PATCH {{endpoint}}/{{CreatedClassID}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "description": "Updated Intermediate Vinyasa class"
+}
+###
+
+# 27. PATCH - Update Class Time (Partial Update)
+# @name patchUpdateClassTime
+PATCH {{endpoint}}/{{CreatedClassID}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "startTime": "12:00",
+  "endTime": "13:30"
+}
+###
+
+# 28. PATCH - Update Class Location ID (Partial Update)
+# @name patchUpdateClassLocationID
+PATCH {{endpoint}}/{{CreatedClassID}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "classLocationId": "67152f7ad390614ec5cc9633"
+}
+###
+
+# 29. PATCH - Attempt to Update Non-Existent Class
+# @name patchNonExistentClass
+PATCH {{endpoint}}/nonexistentID123 HTTP/1.1
+Content-Type: application/json
+
+{
+  "description": "This will not work"
+}
+###
+
+# 30. PATCH - Attempt Invalid Class ID Format
+# @name patchInvalidClassIDFormat
+PATCH {{endpoint}}/invalidIDFormat HTTP/1.1
+Content-Type: application/json
+
+{
+  "description": "This will fail due to invalid ID format"
+}
+###
+
+# 31. PATCH - Attempt to Update Class with Invalid Data
+# @name patchUpdateClassWithInvalidData
+PATCH {{endpoint}}/{{CreatedClassID}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "date": "invalid-date"
+}
+###
+# Expected Result: Success 200 or Validation Failure (if additional Joi validation added in controller)

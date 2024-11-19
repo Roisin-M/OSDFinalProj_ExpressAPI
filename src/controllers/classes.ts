@@ -119,7 +119,7 @@ export const createClass = async (req: Request, res: Response) => {
     }
 };
 
-// Update a class
+// Update a class with PUT
 export const updateClass = async (req: Request, res: Response) => {
     let id: string = req.params.id;
     const updatedClass = req.body as Partial<Class>; // Partial allows updating only a subset of fields
@@ -141,6 +141,37 @@ export const updateClass = async (req: Request, res: Response) => {
         }
     } catch (error) {
         res.status(500).send(`Error updating class with id ${id}`);
+    }
+};
+
+//update PATCH
+export const updateClassPatch = async (req: Request, res: Response)=>{
+    let id: string = req.params.id;
+    const updates = req.body;
+    try {
+        // Validate ObjectId is a valid mongoDb object
+        if (!ObjectId.isValid(id)) {
+            res.status(400).json({ message: "Invalid class ID format" });
+            return;
+        }
+
+        //update using $set operator so only specified fields are edited
+        const result = await classesCollection.updateOne(
+            {_id: new ObjectId(id)},
+            {$set: updates}
+        );
+        if (result.matchedCount > 0) {
+            if (result.modifiedCount > 0) {
+                res.status(200).json({ message: `Successfully updated class with id ${id}` });
+            } else {
+                res.status(200).json({ message: `No changes made to class with id ${id}` });
+            }
+        } else {
+            res.status(404).json({ message: `No class found with id ${id}` });
+        }
+    }catch(error){
+        console.error("Error updating class:", error);
+        res.status(500).json({ message: "An error occurred while updating the class" });
     }
 };
 
