@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Instructor, { ValidateInstructor } from "../models/instructor";
+import Instructor, { ValidateInstructor, ValidateInstructorPut } from "../models/instructor";
 import { classesCollection, instructorsCollection } from "../database";
 import { ObjectId } from "mongodb";
 import Joi from "joi";
@@ -101,19 +101,16 @@ export const updateInstructorPut = async (req:Request, res:Response)=>{
             return;
         } 
 
+         // Validate the request body with Joi
+        const validateResult = ValidateInstructorPut(req.body);
+        if (validateResult.error) {
+            res.status(400).json(validateResult.error);
+            return;
+        }
+
         //check the request body has all required fields for update
         const updatedInstructor = req.body as Instructor;
 
-        //balidate all fields exist
-        if(
-            !updatedInstructor.name ||
-            !updatedInstructor.email ||
-            !updatedInstructor.yogaSpecialities ||
-            !updatedInstructor.classIds === undefined
-        ){
-            res.status(400).json({ message: "All fields must be provided for a PUT update." });
-            return;
-        }
         //apply update
         const result = await instructorsCollection.replaceOne(
             {_id:new ObjectId(id)},
