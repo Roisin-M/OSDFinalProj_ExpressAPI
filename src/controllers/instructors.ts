@@ -57,20 +57,20 @@ export const createInstructor = async (req: Request, res: Response) => {
         // Extract instructor data from request body
         const { name, yogaSpecialities, email } = req.body;
 
+         // Validate the instructor data
+         let validateResult: Joi.ValidationResult = ValidateInstructor(req.body);
+
+         if (validateResult.error) {
+             res.status(400).json(validateResult.error);
+             return;
+         }
+
         // Create a new instructor object with dateJoined and lastUpdated set to current date
         const newInstructor: Instructor = {
             name,
             yogaSpecialities,
             email,
         };
-
-        // Validate the instructor data
-        let validateResult: Joi.ValidationResult = ValidateInstructor(req.body);
-
-        if (validateResult.error) {
-            res.status(400).json(validateResult.error);
-            return;
-        }
 
         // Insert the new instructor into the database
         const result = await instructorsCollection.insertOne(newInstructor);
@@ -91,29 +91,90 @@ export const createInstructor = async (req: Request, res: Response) => {
     }
 };
 
-// Update an instructor
-export const updateInstructor = async (req: Request, res: Response) => {
-    let id: string = req.params.id;
-    const updatedInstructor = req.body as Partial<Instructor>; // Partial type allows for updating only a subset of Instructor properties
+//update isntructor with PUT
+export const updateInstructorPut = async (req:Request, res:Response)=>{
+    let id: string=req.params.id;
+    try{
+        // Validate ObjectId is a valid mongoDb object
+        if (!ObjectId.isValid(id)) {
+            res.status(400).json({ message: "Invalid instructor ID format" });
+            return;
+        } 
 
-    try {
-        const query = { _id: new ObjectId(id) };
-        const update = { $set: updatedInstructor }; // $set will only update the provided fields
+        //check the request body has all required fields for update
+        const updatedInstructor = req.body as Instructor;
 
-        const result = await instructorsCollection.updateOne(query, update);
-
-        if (result.matchedCount > 0) {
-            if (result.modifiedCount > 0) {
-                res.status(200).json({ message: `Successfully updated instructor with id ${id}` });
-            } else {
-                res.status(200).json({ message: `No changes made to instructor with id ${id}` });
-            }
-        } else {
-            res.status(404).json({ message: `No instructor found with id ${id}` });
+        //balidate all fields exist
+        if(
+            !updatedInstructor.name ||
+            !updatedInstructor.email ||
+            !updatedInstructor.yogaSpecialities ||
+            !updatedInstructor.classIds === undefined
+        ){
+            res.status(400).json({ message: "All fields must be provided for a PUT update." });
+            return;
         }
-    } catch (error) {
-        console.error(error);
-        res.status(500).send(`Error updating instructor with id ${id}`);
+        //apply update
+        const result = await instructorsCollection.replaceOne(
+            {_id:new ObjectId(id)},
+            updatedInstructor
+        );
+        //error handling
+        if (result.modifiedCount > 0) {
+            res.status(200).json({ message: `Successfully updated instructor with id ${id}` });
+        } else {
+            res.status(200).json({ message: `No changes made to instructor with id ${id}` });
+        }
+    }catch(error){
+        console.error("Error updating instructor:", error);
+        res.status(500).json({ message: "An error occurred while trying to update the instructor with PUT operation." });
+    }
+};
+
+//update with PATCH - update some fields not all
+export const updateInstructorPatch = async (req:Request, res:Response)=>{
+    let id: string = req.params.id;
+    const updates = req.body;
+
+    try{
+      // Validate ObjectId is a valid mongoDb object
+      if (!ObjectId.isValid(id)) {
+        res.status(400).json({ message: "Invalid instructor ID format" });
+        return;
+        }  
+
+        //validate fields
+        const allowedFields = ["name", "yogaSpecialities", "email", "classIds"];
+
+        // Filter updates to include only allowed fields
+        const filteredUpdates: Record<string, any> = {};
+
+        for (const key of Object.keys(updates)) {
+            if (allowedFields.includes(key)) {
+              filteredUpdates[key] = updates[key];
+            }
+          }
+
+        // If no valid fields are included, reject the update
+        if (Object.keys(filteredUpdates).length === 0) {
+            res.status(400).json({ message: "No valid fields provided for update." });
+            return;
+        }
+
+        //update using $set operator so only specified fields are edited
+        const result = await instructorsCollection.updateOne(
+            {_id: new ObjectId(id)},
+            {$set:filteredUpdates}
+        );
+        if (result.modifiedCount > 0) {
+            res.status(200).json({ message: `Successfully updated instructor with id ${id}` });
+        } else {
+            res.status(200).json({ message: `No changes made to instructor with id ${id}` });
+        }
+
+    }catch(error){
+        console.error("Error updating instructor:", error);
+        res.status(500).json({ message: "An error occurred while updating the instructor" });
     }
 };
 

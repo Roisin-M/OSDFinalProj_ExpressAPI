@@ -3,15 +3,17 @@ import {
     getInstructors,
     getInstructorById,
     createInstructor,
-    updateInstructor,
     deleteInstructor,
+    updateInstructorPatch,
+    updateInstructorPut,
 } from '../controllers/instructors';
 const router: Router=express.Router();
 
 router.get('/',getInstructors);
 router.get('/:id',getInstructorById);
 router.post('/',createInstructor);
-router.put('/:id',updateInstructor);
+router.put('/:id',updateInstructorPut);
+router.patch('/:id',updateInstructorPatch);
 router.delete('/:id',deleteInstructor);
 
 export default router;
