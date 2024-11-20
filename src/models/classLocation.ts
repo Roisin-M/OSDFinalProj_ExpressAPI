@@ -19,25 +19,8 @@ export default interface ClassLocation{
 // create an array of valid values from Class Format enum
 const classFormatsValues = Object.values(ClassFormat);
 
-// Joi validation schema for Class Location
+// Joi validation schema for Class Location and updates put
 export const ValidateClassLocation = (classLocation: ClassLocation) => {
-    const classLocationJoiSchema = Joi.object<ClassLocation>({
-        name: Joi.string().min(3).required(), // Name must be at least 3 characters and required
-        classFormats: Joi.array()
-            .items(
-                Joi.string().valid(...classFormatsValues)
-            )
-            .min(1)
-            .required(), // Must have at least 1 class format and required
-        location:Joi.string().min(5).required(), // must be at least 5 characters and required
-        maxCapacity:Joi.number().min(5).required() //max capacity must be at least 5
-    });
-  
-    return classLocationJoiSchema.validate(classLocation);
-  };
-
-  //Joi validation schema for an update
-  export const ValidateClassLocationPut = (classLocation: Partial<ClassLocation>)=>{
     const classLocationJoiSchema= Joi.object<ClassLocation>({
         name: Joi.string().min(3).required(), // Name must be at least 3 characters and required
         classFormats: Joi.array()

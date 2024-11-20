@@ -36,45 +36,29 @@ export default interface Instructor{
 // create an array of valid values from YogaSpeciality enum
 const yogaSpecialityValues = Object.values(YogaSpeciality);
 
-// Joi validation schema for Instructor
+// Joi validation schema for Instructor and put updates
 export const ValidateInstructor = (instructor: Instructor) => {
   const instructorJoiSchema = Joi.object<Instructor>({
-      name: Joi.string().min(3).required(), // Name must be at least 3 characters and required
-      yogaSpecialities: Joi.array()
-          .items(
-              Joi.string().valid(...yogaSpecialityValues)
-          )
-          .min(1)
-          .required(), // Must have at least 1 yoga speciality and required
-      email: Joi.string().email().required() // Email must be valid and required
-  });
+    name: Joi.string().min(3).required(), // Name must be at least 3 characters and required
+    yogaSpecialities: Joi.array()
+      .items(
+          Joi.string().valid(...yogaSpecialityValues))
+      .min(1)
+      .required(), // Must have at least 1 valid yoga speciality and required
+    email: Joi.string().email().required(), // Email must be valid and required
+    classIds: Joi.array()
+      .items(
+          Joi.string()
+          .custom((value, helpers) => {
+        if (!ObjectId.isValid(value)) {
+          return helpers.error("invalid.classId", { value });
+        }
+        return value;
+      }))
+      .optional() // classIds is optional, but must contain valid ObjectId strings
+  }).required(); // The entire object must be provided for a complete update
 
   return instructorJoiSchema.validate(instructor, { abortEarly: false });
+  //all joi validation errors are displayed instead of stopping and displaying just the first one
 };
-
-// Joi validation schema for complete update (PUT)
-export const ValidateInstructorPut = (instructor: Partial<Instructor>) => {
-    const instructorJoiSchema = Joi.object<Instructor>({
-      name: Joi.string().min(3).required(), // Name must be at least 3 characters and required
-      yogaSpecialities: Joi.array()
-        .items(
-            Joi.string().valid(...yogaSpecialityValues))
-        .min(1)
-        .required(), // Must have at least 1 valid yoga speciality and required
-      email: Joi.string().email().required(), // Email must be valid and required
-      classIds: Joi.array()
-        .items(
-            Joi.string()
-            .custom((value, helpers) => {
-          if (!ObjectId.isValid(value)) {
-            return helpers.error("invalid.classId", { value });
-          }
-          return value;
-        }))
-        .optional() // classIds is optional, but must contain valid ObjectId strings
-    }).required(); // The entire object must be provided for a complete update
-  
-    return instructorJoiSchema.validate(instructor, { abortEarly: false });
-    //all joi validation errors are displayed instead of stopping and displaying just the first one
-  };
   

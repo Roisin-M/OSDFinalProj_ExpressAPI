@@ -1,5 +1,5 @@
 import { Request, response, Response } from "express";
-import ClassLocation, { ValidateClassLocation, ValidateClassLocationPut } from "../models/classLocation";
+import ClassLocation, { ValidateClassLocation} from "../models/classLocation";
 import { classesCollection, classLocationsCollection, instructorsCollection } from "../database";
 import { ObjectId } from "mongodb";
 import Joi from "joi";
@@ -102,7 +102,7 @@ export const updateClassLocationPut = async (req: Request, res: Response) => {
         } 
 
         //validate the request with joi
-        const validateResult = ValidateClassLocationPut(req.body);
+        const validateResult = ValidateClassLocation(req.body);
         if (validateResult.error) {
             res.status(400).json(validateResult.error);
             return;

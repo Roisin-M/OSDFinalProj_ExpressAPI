@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Instructor, { ValidateInstructor, ValidateInstructorPut } from "../models/instructor";
+import Instructor, { ValidateInstructor } from "../models/instructor";
 import { classesCollection, instructorsCollection } from "../database";
 import { ObjectId } from "mongodb";
 import Joi from "joi";
@@ -102,7 +102,7 @@ export const updateInstructorPut = async (req:Request, res:Response)=>{
         } 
 
          // Validate the request body with Joi
-        const validateResult = ValidateInstructorPut(req.body);
+        const validateResult = ValidateInstructor(req.body);
         if (validateResult.error) {
             res.status(400).json(validateResult.error);
             return;

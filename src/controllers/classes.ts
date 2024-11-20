@@ -135,26 +135,16 @@ export const updateClassPut = async(req:Request, res:Response)=>{
             return;
         }
 
-        //check the request body has all required fields for update
-        const updatedClass = req.body as Class;
+        //joi validation
+        let validateResult: Joi.ValidationResult = ValidateClass(req.body);
 
-        //validate all fields exist
-        if(
-            !updatedClass.instructorId ||
-            !updatedClass.description ||
-            !updatedClass.classLocationId ||
-            !updatedClass.date ||
-            !updatedClass.startTime ||
-            !updatedClass.endTime ||
-            !updatedClass.level ||
-            !updatedClass.type ||
-            !updatedClass.category ||
-            !updatedClass.classFormat ||
-            updatedClass.spacesAvailable === undefined
-        ){
-            res.status(400).json({ message: "All fields must be provided for a PUT update." });
+        if (validateResult.error) {
+            res.status(400).json(validateResult.error);
             return;
         }
+
+        const updatedClass = req.body as Class;
+
         //apply update
         const result = await classesCollection.replaceOne(
             {_id: new ObjectId(id)},

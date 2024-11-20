@@ -75,7 +75,7 @@ const yogaSpecialityValues = Object.values(YogaSpeciality);
 //const datePattern = /^(0[1-9]|[12][0-9]|3[01])(\/|-)(0[1-9]|1[0-2])(\/|-)(19|20)\d{2}$/;
 const timePattern = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/
 
-// Joi validation schema for Class
+// Joi validation schema for Class and for puts
 export const ValidateClass = (classObj: Class) => {
     const classJoiSchema = Joi.object<Class>({
         instructorId: Joi.string().custom((value, helpers) => {
@@ -124,7 +124,7 @@ export const ValidateClass = (classObj: Class) => {
             .required(), // Must have at least one valid class category
         classFormat: Joi.string().valid(...classFormatValues).required(), // Class Format is required and must be a valid format
         spacesAvailable: Joi.number().integer().min(0).required() // Spaces available must be a non-negative integer and required
-    });
+    }).required();
 
-    return classJoiSchema.validate(classObj);
+    return classJoiSchema.validate(classObj, {abortEarly:false});
 };

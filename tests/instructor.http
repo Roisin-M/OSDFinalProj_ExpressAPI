@@ -95,7 +95,7 @@ Content-Type: application/json
 ###
 # Expected Result: HTTP 200 with "Successfully updated instructor" message
 
-# 8. PUT - Update an Instructor Completely (Success)
+# 8. PUT - Update an Instructor Completely invalid field
 # @name putValidInstructorUpdate
 PUT {{endpoint}}/{{InstructorID}} HTTP/1.1
 Content-Type: application/json
@@ -130,7 +130,6 @@ Content-Type: application/json
   "email": "invalidpatch@example.com"
 }
 ###
-# Expected Result: HTTP 200 with "No changes made" if unsupported fields are ignored
 
 # 11. DELETE - Delete Instructor by ID (Using InstructorID captured from POST request)
 DELETE {{endpoint}}/{{InstructorID}} HTTP/1.1
