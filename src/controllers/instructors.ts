@@ -108,7 +108,7 @@ export const updateInstructorPut = async (req:Request, res:Response)=>{
             return;
         }
 
-        //check the request body has all required fields for update
+        //create req.body as an object
         const updatedInstructor = req.body as Instructor;
 
         //apply update

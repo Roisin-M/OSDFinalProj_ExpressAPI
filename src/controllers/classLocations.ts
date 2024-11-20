@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import ClassLocation, { ValidateClassLocation } from "../models/classLocation";
+import { Request, response, Response } from "express";
+import ClassLocation, { ValidateClassLocation, ValidateClassLocationPut } from "../models/classLocation";
 import { classesCollection, classLocationsCollection, instructorsCollection } from "../database";
 import { ObjectId } from "mongodb";
 import Joi from "joi";
@@ -91,29 +91,87 @@ export const createClassLocation = async (req: Request, res: Response) => {
     }
 };
 
-// Update a class location
-export const updateClassLocation = async (req: Request, res: Response) => {
+// Update a class location with Put
+export const updateClassLocationPut = async (req: Request, res: Response) => {
     let id: string = req.params.id;
-    const updatedClassLocation = req.body as Partial<ClassLocation>; // Partial type allows for updating only a subset of Class Location properties
+   try{
+        // Validate ObjectId is a valid mongoDb object
+        if (!ObjectId.isValid(id)) {
+            res.status(400).json({ message: "Invalid class Location ID format" });
+            return;
+        } 
 
-    try {
-        const query = { _id: new ObjectId(id) };
-        const update = { $set: updatedClassLocation }; // $set will only update the provided fields
-
-        const result = await classLocationsCollection.updateOne(query, update);
-
-        if (result.matchedCount > 0) {
-            if (result.modifiedCount > 0) {
-                res.status(200).json({ message: `Successfully updated class location with id ${id}` });
-            } else {
-                res.status(200).json({ message: `No changes made to class location with id ${id}` });
-            }
-        } else {
-            res.status(404).json({ message: `No class location found with id ${id}` });
+        //validate the request with joi
+        const validateResult = ValidateClassLocationPut(req.body);
+        if (validateResult.error) {
+            res.status(400).json(validateResult.error);
+            return;
         }
-    } catch (error) {
-        console.error(error);
-        res.status(500).send(`Error updating class location with id ${id}`);
+
+        //create req.body as an object
+        const updatedClasLocation = req.body as ClassLocation;
+
+        const result=await classLocationsCollection.replaceOne(
+            {_id:new ObjectId(id)},
+            updatedClasLocation
+        );
+
+         //error handling
+         if (result.modifiedCount > 0) {
+            res.status(200).json({ message: `Successfully updated class location with id ${id}` });
+        } else {
+            res.status(200).json({ message: `No changes made to class location with id ${id}` });
+        }
+
+
+   }catch(error){
+    console.error("Error updating class location:", error);
+    res.status(500).json({ message: "An error occurred while trying to update the class location with PUT operation." });
+   }
+};
+
+//u[date with PATCH - update some fields not all
+export const updateClassLocationPatch = async (req:Request, res:Response)=>{
+    let id: string = req.params.id;
+    const updates = req.body;
+    try{
+        // Validate ObjectId is a valid mongoDb object
+      if (!ObjectId.isValid(id)) {
+        res.status(400).json({ message: "Invalid class Location ID format" });
+        return;
+        } 
+        //validate fields
+        const allowedFields =["name","maxCapacity","location","classFormats","classIDs"]; 
+
+        // Filter updates to include only allowed fields
+        const filteredUpdates: Record<string, any> = {};
+
+        for (const key of Object.keys(updates)) {
+            if (allowedFields.includes(key)) {
+              filteredUpdates[key] = updates[key];
+            }
+          }
+
+        // If no valid fields are included, reject the update
+        if (Object.keys(filteredUpdates).length === 0) {
+            res.status(400).json({ message: "No valid fields provided for update." });
+            return;
+        } 
+        
+        //update using set operator so only specified fields are edited
+        const result = await classLocationsCollection.updateOne(
+            {_id:new ObjectId(id)},
+            {$set:filteredUpdates}
+        );
+        //error handling
+        if (result.modifiedCount > 0) {
+            res.status(200).json({ message: `Successfully updated class Location with id ${id}` });
+        } else {
+            res.status(200).json({ message: `No changes made to class Location with id ${id}` });
+        }
+    }catch(error){
+        console.error("Error updating class location:", error);
+        res.status(500).json({ message: "An error occurred while updating the class location" });
     }
 };
 

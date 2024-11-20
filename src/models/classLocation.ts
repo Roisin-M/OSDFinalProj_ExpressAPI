@@ -35,3 +35,30 @@ export const ValidateClassLocation = (classLocation: ClassLocation) => {
   
     return classLocationJoiSchema.validate(classLocation);
   };
+
+  //Joi validation schema for an update
+  export const ValidateClassLocationPut = (classLocation: Partial<ClassLocation>)=>{
+    const classLocationJoiSchema= Joi.object<ClassLocation>({
+        name: Joi.string().min(3).required(), // Name must be at least 3 characters and required
+        classFormats: Joi.array()
+            .items(
+                Joi.string().valid(...classFormatsValues)
+            )
+            .min(1)
+            .required(), // Must have at least 1 class format and required
+        location:Joi.string().min(5).required(), // must be at least 5 characters and required
+        maxCapacity:Joi.number().min(5).required(), //max capacity must be at least 5
+        classIDs: Joi.array()
+        .items(
+            Joi.string()
+            .custom((value, helpers) => {
+          if (!ObjectId.isValid(value)) {
+            return helpers.error("invalid.classId", { value });
+          }
+          return value;
+        }))
+        .optional() // classIds is optional, but must contain valid ObjectId strings
+    }).required();
+    return classLocationJoiSchema.validate(classLocation, {abortEarly:false});
+     //all joi validation errors are displayed instead of stopping and displaying just the first one
+  }

@@ -66,7 +66,6 @@ Content-Type: application/json
 }
 ###
 
-
 # 6. GET - Retrieve Class Location by ID (Using ID from POST response)
 # @name GetClassLocationByID
 GET {{endpoint}}/{{ClassLocationID}} HTTP/1.1
@@ -90,18 +89,95 @@ GET {{endpoint}}?filter={"classFormats":"Stream"} HTTP/1.1
 Content-Type: application/json
 ###
 
-# 10. PUT - Update a Class Location (Update Class Formats to Both)
-# @name UpdateClassLocationFormats
+# 10. PUT - Update a Class Location (Update All Fields)
+# @name UpdateClassLocationFull
 PUT {{endpoint}}/{{ClassLocationID}} HTTP/1.1
 Content-Type: application/json
 
 {
-  "classFormats": ["Both"]
+  "name": "Updated Yoga Studio",
+  "maxCapacity": 50,
+  "location": "123 New Street, Downtown",
+  "classFormats": ["Both"],
+  "classIDs": []
 }
 ###
 
-# 11. DELETE - Delete Class Location by ID (Using ID from POST response)
+# 11. PUT - Update a Class Location (Invalid Field Included)
+# @name UpdateClassLocationInvalidField
+PUT {{endpoint}}/{{ClassLocationID}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Updated Yoga Studio",
+  "maxCapacity": 50,
+  "location": "123 New Street, Downtown",
+  "classFormats": ["Both"],
+  "unknownField": "Invalid"
+}
+###
+
+# 12. PATCH - Update Class Location Name and Capacity (Partial Update)
+# @name PatchUpdateClassLocation
+PATCH {{endpoint}}/{{ClassLocationID}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Partially Updated Yoga Studio",
+  "maxCapacity": 60
+}
+###
+
+# 13. PATCH - Update Class Location (Invalid Field)
+# @name PatchUpdateClassLocationInvalidField
+PATCH {{endpoint}}/{{ClassLocationID}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "unknownField": "Invalid Update"
+}
+###
+
+# 14. DELETE - Delete Class Location by ID (Using ID from POST response)
 # @name DeleteClassLocation
 DELETE {{endpoint}}/{{ClassLocationID}} HTTP/1.1
+Content-Type: application/json
+###
+
+# 15. GET - Try to Retrieve a Non-Existent Class Location
+# @name GetNonExistentClassLocation
+GET {{endpoint}}/nonexistentID HTTP/1.1
+Content-Type: application/json
+###
+
+# 16. POST - Create Another Valid Class Location
+# @name PostAnotherValidClassLocation
+POST {{endpoint}} HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "Suburban Yoga Studio",
+  "maxCapacity": 40,
+  "location": "321 Suburbia Blvd, Suburbia",
+  "classFormats": ["Stream"]
+}
+###
+@AnotherClassLocationID = {{PostAnotherValidClassLocation.response.headers.location}}
+
+# 17. GET - Retrieve All Class Locations with "Location" Format
+# @name GetClassLocationsWithLocationFormat
+GET {{endpoint}}?filter={"classFormats":"Location"} HTTP/1.1
+Content-Type: application/json
+###
+
+# 18. GET - Retrieve Paginated Class Locations with Virtual Format (Page 2, 5 per page)
+# @name GetPaginatedClassLocationsWithVirtualFormat
+GET {{endpoint}}?page=2&pageSize=5&filter={"classFormats":"Stream"} HTTP/1.1
+Content-Type: application/json
+###
+
+# 19. DELETE - Delete the Second Class Location by ID
+# @name DeleteSecondClassLocation
+DELETE {{endpoint}}/{{AnotherClassLocationID}} HTTP/1.1
 Content-Type: application/json
 ###
