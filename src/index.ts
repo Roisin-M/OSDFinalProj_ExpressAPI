@@ -3,17 +3,16 @@ import instructorRoutes from './routes/instructors';
 import classLocationRoutes from './routes/classLocations';
 import classRoutes from './routes/classes';
 import dotenv from "dotenv";
+import cors from "cors";
 //import morgan from "morgan";
 
 dotenv.config();
-
 const PORT = process.env.Port || 3001;
-
 const app: Application = express();
 
-app.use(express.json());
-
 //app.use(morgan("tiny"));
+app.use(cors());
+app.use(express.json());
 
 app.get("/ping", async (_req : Request, res: Response) => {
     res.json({
