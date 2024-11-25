@@ -22,7 +22,6 @@ export const getInstructors = async (req: Request, res:Response)=>{
         //sorting by name in ascending / alphabetical order
         const instructors = await instructorsCollection
         .find(filterobj)
-        .project({'_id':0})
         .sort({'name':1})
         .skip((page-1)*pageSize)
         .limit(pageSize)
@@ -41,13 +40,20 @@ export const getInstructorById = async (req:Request,res:Response)=>{
         const query = {_id: new ObjectId(id)};
         const instructor = (await instructorsCollection.findOne(query)) as Instructor;
         if(instructor){
-            // Fetch associated classes
-            const classes = await classesCollection.find({ instructorId: query}).toArray();
-            res.status(200).json({instructor, classes});
-        }
+            // Fetch associated classes and embed them in the instructor
+            const classIds = (await classesCollection
+                .find({instructorId: new ObjectId(id)},{ projection: { _id: 1 } })
+                .toArray()).map((c) => c._id );
+                instructor.classIds=classIds; //update instructor
+           // const classes = await classesCollection.find({ instructorId: new ObjectId(id)}).toArray();
+            res.status(200).json({instructor});
+        }else {
+            res.status(404).send(`Unable to find matching document with id: ${id}`);
+          }
     } catch{
         res.status(404).send(`Unable to find matching document with id :
-            ${req.params.id}`);
+            ${id}`);
+        res.status(500).send("Internal Server Error");
     }
 };
 
