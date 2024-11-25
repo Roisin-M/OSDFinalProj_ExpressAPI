@@ -22,7 +22,6 @@ export const getClassLocations = async (req: Request, res:Response)=>{
         //sorting by name in ascending / alphabetical order
         const classLocations = await classLocationsCollection
         .find(filterobj)
-        .project({'_id':0})
         .sort({'name':1})
         .skip((page-1)*pageSize)
         .limit(pageSize)
@@ -40,10 +39,15 @@ export const getClassLocationsById = async (req:Request,res:Response)=>{
         const query = {_id: new ObjectId(id)};
         const classLocation = (await classLocationsCollection.findOne(query)) as ClassLocation;
         if(classLocation){
-            //fetch associated classes
-            const classes = await classesCollection.find({classLocationId: query}).toArray();
-            res.status(200).json({classLocation, classes});
-        }
+            // Fetch associated classes and embed them in the class location
+            const classIds = (await classesCollection
+                .find({classLocationId: new ObjectId(id)},{ projection: { _id: 1 } })
+                .toArray()).map((c) => c._id );
+                classLocation.classIDs=classIds; //update class location
+            res.status(200).json({classLocation});
+        }else {
+            res.status(404).send(`Unable to find matching document with id: ${id}`);
+          }
     } catch{
         res.status(404).send(`Unable to find matching document with id :
             ${req.params.id}`);
