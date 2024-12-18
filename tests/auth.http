@@ -11,7 +11,7 @@ content-type: application/json
 ###
 @accessToken = {{login.response.body.accessToken}}
 
-DELETE http://localhost:3000/api/v1/users/66f1428fd79bf0c5ae9988 HTTP/1.1
+DELETE http://localhost:3000/yoga-studio-management-api/v1/users/6762dc00abb5a0c549472423 HTTP/1.1
 content-type: application/json
 Authorization: Bearer {{accessToken}}
 
