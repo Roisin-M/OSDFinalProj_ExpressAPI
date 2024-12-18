@@ -2,6 +2,7 @@ import express, {Application, Request, Response} from "express";
 import instructorRoutes from './routes/instructors';
 import classLocationRoutes from './routes/classLocations';
 import classRoutes from './routes/classes';
+import userRoutes from './routes/users';
 import dotenv from "dotenv";
 import cors from "cors";
 //import morgan from "morgan";
@@ -23,6 +24,7 @@ app.get("/ping", async (_req : Request, res: Response) => {
 app.use('/yoga-studio-management-api/v1/instructors',instructorRoutes)
 app.use('/yoga-studio-management-api/v1/classlocations',classLocationRoutes)
 app.use('/yoga-studio-management-api/v1/classes',classRoutes)
+app.use('/yoga-studio-management-api/v1/users',userRoutes)
 
 
 app.listen(PORT, () => {

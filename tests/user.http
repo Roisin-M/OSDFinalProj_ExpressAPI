@@ -1,0 +1,47 @@
+
+@endpoint=http://localhost:3000/yoga-studio-management-api/v1/users
+
+# @name postAUser
+POST {{endpoint}} HTTP/1.1
+content-type: application/json
+
+{ "name" : "joe",
+   "phonenumber" : "0873330067",
+   "email": "joiisuser@gmail.com",
+   "password": "hi1234567"
+}
+###
+@ID = {{postAUser.response.headers.location}}
+
+### get user by id
+GET {{endpoint}}/{{ID}} HTTP/1.1 
+
+### 
+
+# @name GETALLUSERS
+GET {{endpoint}} HTTP/1.1
+content-type: application/json
+
+###
+### update of the user's email and phone number
+PUT {{endpoint}}/{{ID}} HTTP/1.1
+content-type: application/json
+
+{
+   "phonenumber": "0869876543",
+   "email": "updatedagainemail@example.com",
+   "password": "123456789"
+}
+
+### delete by id
+DELETE {{endpoint}}/{{ID}} HTTP/1.1
+content-type: application/json
+
+### update of the user's email and phone number
+PUT {{endpoint}}/{{ID}} HTTP/1.1
+content-type: application/json
+
+{
+   "phonenumber": "0869876543",
+   "email": "updatedemail@example.com"
+}

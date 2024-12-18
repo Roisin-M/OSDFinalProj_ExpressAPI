@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import instructor from "./models/instructor";
 import ClassLocation from "./models/classLocation";
 import Class from "./models/class";
+import User from "./models/user";
 
 dotenv.config();
 const connectionString : string = process.env.DB_CONN_STRING || "";
@@ -17,13 +18,15 @@ let db : Db
 export let instructorsCollection : Collection<instructor>;
 export let classLocationsCollection : Collection<ClassLocation>;
 export let classesCollection : Collection<Class>;
+export let usersCollection : Collection<User>;
 
  
 
 export const collections: { 
     instructors?: Collection<instructor>,
     classLocations?: Collection<ClassLocation>,
-    classes? : Collection<Class> } = {}; 
+    classes? : Collection<Class>,
+    users? : Collection<User> } = {}; 
 client.connect().then 
 (()=> 
 { 
@@ -31,9 +34,11 @@ db = client.db(dbName);
 instructorsCollection = db.collection('instructors'); 
 classLocationsCollection = db.collection('ClassLocations');
 classesCollection = db.collection('classes');
+usersCollection = db.collection('users');
 collections.instructors = instructorsCollection; 
 collections.classLocations = classLocationsCollection;
 collections.classes = classesCollection;
+collections.users = usersCollection;
 console.log('Connected to database'); 
 } 
 ) 
