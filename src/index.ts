@@ -3,6 +3,7 @@ import instructorRoutes from './routes/instructors';
 import classLocationRoutes from './routes/classLocations';
 import classRoutes from './routes/classes';
 import userRoutes from './routes/users';
+import authRoutes from './routes/auths';
 import dotenv from "dotenv";
 import cors from "cors";
 //import morgan from "morgan";
@@ -25,6 +26,7 @@ app.use('/yoga-studio-management-api/v1/instructors',instructorRoutes)
 app.use('/yoga-studio-management-api/v1/classlocations',classLocationRoutes)
 app.use('/yoga-studio-management-api/v1/classes',classRoutes)
 app.use('/yoga-studio-management-api/v1/users',userRoutes)
+app.use('/yoga-studio-management-api/v1/auth',authRoutes)
 
 
 app.listen(PORT, () => {
