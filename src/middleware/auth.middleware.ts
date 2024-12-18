@@ -13,7 +13,7 @@ export const validJWTProvided = async (
 
       if (!authHeader || !authHeader?.startsWith('Bearer')) {
         console.log('no header ' + authHeader)
-            res.status(401).send();
+            res.status(401).json({ message: "Unauthorized: Missing token" });
             return;
       }
 
@@ -26,13 +26,11 @@ export const validJWTProvided = async (
       }
       const secret = process.env.JWTSECRET || "not very secret";
     
-
       try{
         console.log(token);
         const payload = jwtVerify(token, secret);
         res.locals.payload = payload;
-        next();
-            
+        next();  
 
         } catch (err) {
             //access to the requested source is forbidden with the provided credentials
