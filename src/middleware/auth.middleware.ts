@@ -17,7 +17,6 @@ export const validJWTProvided = async (
             return;
       }
 
-     
       const token: string | undefined = authHeader.split(' ')[1];
 
       if (!token) { 

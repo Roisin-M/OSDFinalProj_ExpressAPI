@@ -45,3 +45,14 @@ content-type: application/json
    "phonenumber": "0869876543",
    "email": "updatedemail@example.com"
 }
+###
+# @name postAnotherUser
+POST {{endpoint}} HTTP/1.1
+content-type: application/json
+
+{ "name" : "Mary-jane2",
+   "phonenumber" : "0873330045",
+   "email": "mjmjmj222@gmail.com",
+   "password": "hi1234567"
+}
+###

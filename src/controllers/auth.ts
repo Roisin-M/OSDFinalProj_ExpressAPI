@@ -24,7 +24,6 @@ export const handleLogin = async (req: Request, res: Response) => {
       const dummyHash = await argon2.hash(dummyPassword);
     
       // Use the user's hash if found, otherwise use the dummy hash
-      
      let userPasswordHash;
 
       if (user && user.hashedPassword){
@@ -35,7 +34,6 @@ export const handleLogin = async (req: Request, res: Response) => {
       }
     
       // check password
-
         const isPasswordValid = await argon2.verify(userPasswordHash, password);
     
     
@@ -47,9 +45,18 @@ export const handleLogin = async (req: Request, res: Response) => {
           return;
         }
 
-        res.status(201).send({ accessToken: createAccessToken(user) });
+        res.status(201).send({ 
+            accessToken: createAccessToken(user) });
 
       }
+
+    export const handleLogout = async (req: Request, res: Response)=>{
+        console.log("logout request received");
+
+        //handled in client
+        res.status(200)
+        .json({message: 'logout succesful'});
+    };
 
 const createAccessToken = (user: User | null) : string  => {
 

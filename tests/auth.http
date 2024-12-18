@@ -11,7 +11,7 @@ content-type: application/json
 ###
 @accessToken = {{login.response.body.accessToken}}
 
-DELETE http://localhost:3000/yoga-studio-management-api/v1/users/6762dc00abb5a0c549472423 HTTP/1.1
+DELETE http://localhost:3000/yoga-studio-management-api/v1/users/67630c891c776e2bf8d379a1 HTTP/1.1
 content-type: application/json
 Authorization: Bearer {{accessToken}}
 
@@ -20,3 +20,9 @@ Authorization: Bearer {{accessToken}}
 //If the token has timed out or has the wrong signature you will get a 403.
 //If the token is not attached you will get a 401
 //If the token is OK but there is no user with that ID you will get a 404.
+
+# @name logout
+POST {{endpoint}}/logout HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+###
