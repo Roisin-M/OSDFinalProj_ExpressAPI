@@ -67,3 +67,14 @@ content-type: application/json
    "password": "hi1234567"
 }
 ###
+
+# @name postAnotherUser3
+POST {{endpoint}} HTTP/1.1
+content-type: application/json
+
+{ "name" : "perry platapus",
+   "phonenumber" : "0873330045",
+   "email": "pplatypus@gmail.com",
+   "password": "hi1234567"
+}
+###

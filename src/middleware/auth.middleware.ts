@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { verify as jwtVerify } from 'jsonwebtoken'
+import { 
+  JsonWebTokenError,
+   verify as jwtVerify,
+  TokenExpiredError } from 'jsonwebtoken'
 
 export const validJWTProvided = async (
   req: Request,
@@ -18,12 +21,6 @@ export const validJWTProvided = async (
       }
 
       const token: string | undefined = authHeader.split(' ')[1];
-
-      if (!token) { 
-        //indicates the request lacks valid authentication credentials for the requested source
-        res.status(401).send();
-        return;
-      }
       const secret = process.env.JWTSECRET || "not very secret";
     
       try{
@@ -31,10 +28,16 @@ export const validJWTProvided = async (
         const payload = jwtVerify(token, secret);
         res.locals.payload = payload;
         next();  
-
         } catch (err) {
-            //access to the requested source is forbidden with the provided credentials
-           res.status(403).send();
-           return;
+          if (err instanceof TokenExpiredError) {
+            console.log("Token expired");
+            res.status(401).json({ message: "Unauthorized: Token expired" });
+          } else if (err instanceof JsonWebTokenError) {
+            console.log("Invalid token");
+            res.status(403).json({ message: "Forbidden: Invalid token" });
+          } else {
+            console.log("Unknown error occurred during token verification");
+            res.status(500).json({ message: "Internal server error" });
+          }
         }
     };

@@ -35,8 +35,7 @@ export const handleLogin = async (req: Request, res: Response) => {
     
       // check password
         const isPasswordValid = await argon2.verify(userPasswordHash, password);
-    
-    
+  
         // If password is invalid, return unauthorized
         if (!isPasswordValid) {
          res.status(401).json({
