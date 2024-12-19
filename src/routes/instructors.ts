@@ -7,6 +7,7 @@ import {
     updateInstructorPatch,
     updateInstructorPut,
 } from '../controllers/instructors';
+import { validJWTProvided } from '../middleware/auth.middleware';
 const router: Router=express.Router();
 
 router.get('/',getInstructors);
@@ -14,6 +15,6 @@ router.get('/:id',getInstructorById);
 router.post('/',createInstructor);
 router.put('/:id',updateInstructorPut);
 router.patch('/:id',updateInstructorPatch);
-router.delete('/:id',deleteInstructor);
+router.delete('/:id',validJWTProvided, deleteInstructor);
 
 export default router;
