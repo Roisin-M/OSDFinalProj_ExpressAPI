@@ -13,7 +13,7 @@ const router: Router=express.Router();
 router.get('/',getClassLocations);
 router.get('/:id',getClassLocationsById);
 router.post('/',createClassLocation);
-router.put('/:id',updateClassLocationPut);
+router.put('/:id', validJWTProvided, updateClassLocationPut);
 router.patch('/:id',updateClassLocationPatch);
 router.delete('/:id',validJWTProvided,deleteClassLocation);
 

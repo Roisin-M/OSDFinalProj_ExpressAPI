@@ -13,7 +13,7 @@ const router: Router=express.Router();
 router.get('/',getInstructors);
 router.get('/:id',getInstructorById);
 router.post('/',createInstructor);
-router.put('/:id',updateInstructorPut);
+router.put('/:id', validJWTProvided, updateInstructorPut);
 router.patch('/:id',updateInstructorPatch);
 router.delete('/:id',validJWTProvided, deleteInstructor);
 
