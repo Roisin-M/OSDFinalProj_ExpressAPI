@@ -138,7 +138,6 @@ export const createUser = async (req: Request, res: Response) => {
       hashedPassword: req.body.password
         ? await argon2.hash(req.body.password) // Hash the new password if provided
         : existingUser.hashedPassword, // Retain the existing hashed password if no new password is provided
-      id: existingUser.id || new ObjectId(id), // Ensure the _id field is preserved
     };
 
     //apply update
