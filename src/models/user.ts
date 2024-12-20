@@ -27,7 +27,7 @@ export const ValidateUser = (user: User)=>{
         "string.max": "Password must not exceed 64 characters.",
         "string.empty": "Password is required.",
     }),
-    });
+    }).required(); 
     return userJoiSchema.validate(user, { abortEarly: false });
   //all joi validation errors are displayed instead of stopping and displaying just the first one
 }

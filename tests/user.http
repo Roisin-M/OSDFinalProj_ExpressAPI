@@ -5,10 +5,10 @@
 POST {{endpoint}} HTTP/1.1
 content-type: application/json
 
-{ "name" : "joe",
+{ "name" : "james",
    "phonenumber" : "0873330067",
-   "email": "joiisuser@gmail.com",
-   "password": "hi1234567"
+   "email": "jamesisuser@gmail.com",
+   "password": "@Hi1234567"
 }
 ###
 @ID = {{postAUser.response.headers.location}}
@@ -28,10 +28,12 @@ PUT {{endpoint}}/{{ID}} HTTP/1.1
 content-type: application/json
 
 {
+   "name": "Perry Platypus",
    "phonenumber": "0869876543",
-   "email": "updatedagainemail@example.com",
-   "password": "123456789"
+   "email": "updatedemail@example.com",
+   "password": "@Hi12345"
 }
+###
 
 ### delete by id
 DELETE {{endpoint}}/{{ID}} HTTP/1.1

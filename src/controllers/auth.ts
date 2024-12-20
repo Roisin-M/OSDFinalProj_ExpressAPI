@@ -24,7 +24,7 @@ export const handleLogin = async (req: Request, res: Response) => {
       const dummyHash = await argon2.hash(dummyPassword);
     
       // Use the user's hash if found, otherwise use the dummy hash
-     let userPasswordHash;
+      let userPasswordHash;
 
       if (user && user.hashedPassword){
        userPasswordHash =  user.hashedPassword;

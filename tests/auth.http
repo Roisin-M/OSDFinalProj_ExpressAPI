@@ -6,12 +6,12 @@ content-type: application/json
 
 { 
   "email": "joiisuser@gmail.com",
-  "password": "hi1234567"
+  "password": "@Hi1234567"
 }
 ###
 @accessToken = {{login.response.body.accessToken}}
 
-DELETE http://localhost:3000/yoga-studio-management-api/v1/users/67630c891c776e2bf8d379a1 HTTP/1.1
+DELETE http://localhost:3000/yoga-studio-management-api/v1/users/67656a8a76a4a19038e5f722 HTTP/1.1
 content-type: application/json
 Authorization: Bearer {{accessToken}}
 
@@ -26,3 +26,14 @@ POST {{endpoint}}/logout HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 ###
+
+# @name login2
+POST {{endpoint}} HTTP/3.0
+content-type: application/json
+
+{ 
+  "email": "updatedemail@example.com",
+  "password": "@Hi12345"
+}
+###
+@accessToken2 = {{login.response.body.accessToken}}

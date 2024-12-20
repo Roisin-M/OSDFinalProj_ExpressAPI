@@ -10,7 +10,7 @@ export const getUsers =async  (req: Request, res: Response) => {
     try {
      const users = (await usersCollection
         .find({})
-        .project({password: 0}) //Exclude password
+        .project({hashedPassword: 0}) //Exclude password
         .toArray()) as User[];
      res.status(200).json(users);
   
@@ -32,7 +32,7 @@ export const getUsers =async  (req: Request, res: Response) => {
     try {
       const query = { _id: new ObjectId(id) };
       const user = (await usersCollection.findOne(query,
-         {projection: {password:0}})
+         {projection: {hashedPassword:0}})
         ) as User;
   
       if (user) {
@@ -70,8 +70,6 @@ export const createUser = async (req: Request, res: Response) => {
       }
   
       /// note - missing a check to verify the email belongs to the user
-     
-  
       let newUser : User = 
       { 
         name: req.body.name ,
@@ -81,7 +79,8 @@ export const createUser = async (req: Request, res: Response) => {
       //hashed password
       newUser.hashedPassword = await argon2.hash(req.body.password)
   
-      console.log(newUser.hashedPassword)
+      //console.log(newUser.hashedPassword)
+      delete newUser.password; // Remove plain text password from the insert
   
       const result = await usersCollection.insertOne(newUser)
   
@@ -109,36 +108,56 @@ export const createUser = async (req: Request, res: Response) => {
   export const updateUser = async (req: Request, res: Response) => {
   
     let id:string = req.params.id;
-    const updatedUser = req.body as Partial<User>; // Partial type allows for updating only a subset of User properties
-    //console.log(req.body); //for now just log the data
   
     try {
-      const query = { _id: new ObjectId(id) };
-      const update = { $set: updatedUser }; // $set will only update the provided fields
-  
-      const result = await usersCollection.updateOne(query, update);
-  
-      if (result.matchedCount > 0) {
-        if (result.modifiedCount > 0) {
-          res.status(200).json({ message: `Successfully updated user with id ${id}` });
-        } else {
-          res.status(200).json({ message: `No changes made to user with id ${id}` });
+       // Validate ObjectId is a valid mongoDb object
+       if (!ObjectId.isValid(id)) {
+        res.status(400).json({ message: "Invalid user ID format" });
+        return;
+    } 
+
+    // Fetch the existing user to merge with the new data
+    const existingUser = await usersCollection.findOne({ _id: new ObjectId(id) });
+    if (!existingUser) {
+      res.status(404).json({ message: `No user found with id ${id}` });
+      return;
+    }
+
+    // Validate the request body with Joi
+        const validateResult = ValidateUser(req.body);
+        if (validateResult.error) {
+            res.status(400).json(validateResult.error);
+            return;
         }
+
+    // Construct the updated user object for full replacement
+    const updatedUser: User = {
+      name: req.body.name,
+      phonenumber: req.body.phonenumber,
+      email: req.body.email,
+      hashedPassword: req.body.password
+        ? await argon2.hash(req.body.password) // Hash the new password if provided
+        : existingUser.hashedPassword, // Retain the existing hashed password if no new password is provided
+      id: existingUser.id || new ObjectId(id), // Ensure the _id field is preserved
+    };
+
+    //apply update
+    const result = await usersCollection.replaceOne(
+      {_id:new ObjectId(id)},
+      updatedUser
+    );
+      //error handling
+      if (result.modifiedCount > 0) {
+        res.status(200).json({ message: `Successfully updated user with id ${id}` });
       } else {
-        res.status(404).json({ message: `No user found with id ${id}` });
+        res.status(200).json({ message: `No changes made to user with id ${id}` });
       }
     } catch (error) {
       console.error(error);
       res.status(500).send(`Error updating user with id ${id}`);
     }
-    //res.json({"message": `update user ${req.params.id} with data from the post message`})
   };
-  
-  // export const deleteUser = (req: Request, res: Response) => {
-  //   // logic to delete user by ID from the database
-  
-  //   res.json({"message": `delete user ${req.params.id} from the database`})
-  // };
+
   export const deleteUser = async (req: Request, res: Response) => { 
     
     let id:string = req.params.id;
