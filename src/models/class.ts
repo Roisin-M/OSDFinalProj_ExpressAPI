@@ -64,6 +64,7 @@ export default interface Class {
     category: ClassCategory[]; // Array of class categories (focus of the class)
     classFormat: ClassFormat; // Format of the class (Location, Stream, or Both)
     spacesAvailable: number; // Number of available spaces for the class
+    userIds?: ObjectId[]; // Array of user IDs (references to users) for many-to many relationship
 }
 
 // Create arrays of valid values from enums
@@ -123,7 +124,17 @@ export const ValidateClass = (classObj: Class) => {
             .min(1)
             .required(), // Must have at least one valid class category
         classFormat: Joi.string().valid(...classFormatValues).required(), // Class Format is required and must be a valid format
-        spacesAvailable: Joi.number().integer().min(0).required() // Spaces available must be a non-negative integer and required
+        spacesAvailable: Joi.number().integer().min(0).required(), // Spaces available must be a non-negative integer and required
+        userIds: Joi.array()
+            .items(
+                Joi.string()
+                .custom((value, helpers) => {
+            if (!ObjectId.isValid(value)) {
+                return helpers.error("invalid.userId", { value });
+            }
+            return value;
+            }))
+            .optional() // classIds is optional, but must contain valid ObjectId strings
     }).required();
 
     return classJoiSchema.validate(classObj, {abortEarly:false});

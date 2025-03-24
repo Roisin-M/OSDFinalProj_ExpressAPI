@@ -17,6 +17,9 @@ content-type: application/json
 GET {{endpoint}}/{{ID}} HTTP/1.1 
 
 ### 
+GET {{endpoint}}/6798c605d874f33c7e04ae4b HTTP/1.1
+
+###
 
 # @name GETALLUSERS
 GET {{endpoint}} HTTP/1.1

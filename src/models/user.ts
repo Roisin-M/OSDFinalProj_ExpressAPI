@@ -8,6 +8,7 @@ export default interface User{
     id?: ObjectId;
     password?: string;
     hashedPassword?: string;
+    classIds?: ObjectId[]; // Array of Class IDs (references to classes) for many-to many relationship
 }
 
 export const ValidateUser = (user: User)=>{
@@ -15,6 +16,16 @@ export const ValidateUser = (user: User)=>{
     name: Joi.string().min(3).required(),
     phonenumber: Joi.string().min(10),
     email: Joi.string().email().required(),
+    classIds: Joi.array()
+        .items(
+            Joi.string()
+            .custom((value, helpers) => {
+          if (!ObjectId.isValid(value)) {
+            return helpers.error("invalid.classId", { value });
+          }
+          return value;
+        }))
+        .optional(), // classIds is optional, but must contain valid ObjectId strings
     password: Joi.string()
     .min(8)
     .max(64)

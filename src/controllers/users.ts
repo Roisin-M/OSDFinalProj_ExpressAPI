@@ -52,14 +52,16 @@ export const getUsers =async  (req: Request, res: Response) => {
 export const createUser = async (req: Request, res: Response) => {
     // create a new user in the database
     try {
-  
+      //Extract user from request body
+      const { name, email, phonenumber } = req.body;
+      //validate the user data
       let validateResult : Joi.ValidationResult = ValidateUser(req.body)
   
       if (validateResult.error) {
         res.status(400).json(validateResult.error);
         return;
       }
-  
+      //check if existing user
       const existingUser = await usersCollection.findOne
       ({email: req.body.email
       });
@@ -72,9 +74,9 @@ export const createUser = async (req: Request, res: Response) => {
       /// note - missing a check to verify the email belongs to the user
       let newUser : User = 
       { 
-        name: req.body.name ,
-        email: req.body.email,
-        phonenumber : req.body.phonenumber,
+        name,
+        email,
+        phonenumber,
       }
       //hashed password
       newUser.hashedPassword = await argon2.hash(req.body.password)

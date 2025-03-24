@@ -51,6 +51,10 @@ Content-Type: application/json
 GET {{endpoint}} HTTP/1.1
 ###
 
+# Get testing booking
+GET {{endpoint}}/673ccbe8f9abce235ff2d3b8 HTTP/1.1 
+###
+
 # 5. GET - Retrieve Classes with Filters
 GET {{endpoint}}?filter={"instructorId":"6715857e71fab052665e862f","classLocationId":"67152f7ad390614ec5cc9633"} HTTP/1.1
 ###
