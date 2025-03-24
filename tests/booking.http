@@ -9,3 +9,13 @@ Content-Type: application/json
     "classId": "673ccbe8f9abce235ff2d3b8"
 }
 ###
+
+# @name cancelClass
+DELETE {{endpoint}}/cancel HTTP/1.1
+Content-Type: application/json
+
+{
+    "userId": "6798c605d874f33c7e04ae4b",
+    "classId": "673ccbe8f9abce235ff2d3b8"
+}
+###
