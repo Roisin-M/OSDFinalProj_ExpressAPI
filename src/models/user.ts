@@ -3,7 +3,7 @@ import Joi from "joi";
 
 export default interface User{
     name: string;
-    phonenumber: string;
+    phonenumber?: string;
     email: string;
     id?: ObjectId;
     password?: string;

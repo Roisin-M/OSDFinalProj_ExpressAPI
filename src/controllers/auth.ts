@@ -4,7 +4,7 @@ import * as argon2 from 'argon2';
 import {sign as jwtSign, verify as jwtVerify} from 'jsonwebtoken';
 import User  from '../models/user';
 
-export const handleLogin = async (req: Request, res: Response) => {
+export const handleLogin = async (req: Request, res: Response): Promise<any> => {
 
     const email = req.body?.email
     
@@ -44,8 +44,20 @@ export const handleLogin = async (req: Request, res: Response) => {
           return;
         }
 
-        res.status(201).send({ 
-            accessToken: createAccessToken(user) });
+        if (!user || !user.name || !user.email || !user._id) {
+          return res.status(500).json({ message: 'User data is incomplete or invalid' });
+        }
+
+          // Construct token-safe payload
+          const userPayload = {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+          };
+
+        const accessToken = createAccessToken(userPayload);
+
+        return res.status(201).json({ accessToken });
 
       }
 
@@ -64,10 +76,11 @@ const createAccessToken = (user: User | null) : string  => {
     console.log(expiresTime);
     const payload =
     {
+        _id: user?.id, //include id to allow fetching of current id in angular app
         email: user?.email,
         name: user?.name
     }
-    const token = jwtSign(payload, secret, {expiresIn : expiresTime as number }); 
+    const token = jwtSign(payload, secret, {expiresIn: parseInt(expiresTime.toString())}); 
 
     return token;
 
