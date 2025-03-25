@@ -7,9 +7,9 @@ POST {{endpoint}} HTTP/1.1
 Content-Type: application/json
 
 {
-  "instructorId": "6715857e71fab052665e862f",
+  "instructorId": "671231dd2ebf78470abc7ab1",
   "description": "Intermediate Vinyasa class focusing on flexibility.",
-  "classLocationId": "67152f7ad390614ec5cc9633",
+  "classLocationId": "6744e32fa1e7911b2bfbd568",
   "date": "2024-12-01",
   "startTime": "10:00",
   "endTime": "11:30",

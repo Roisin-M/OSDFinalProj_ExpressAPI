@@ -49,12 +49,13 @@ export const getClassById = async (req: Request, res: Response) => {
         const query = { _id: new ObjectId(id) };
         const classItem = (await classesCollection.findOne(query)) as Class;
         if (classItem) {
-            res.status(200).send(classItem);
+            res.status(200).json({classItem});
         } else {
-            res.status(404).send(`Class not found with id: ${req.params.id}`);
+            res.status(404).send(`Class not found with id: ${id}`);
         }
     } catch (error) {
-        res.status(404).send(`Unable to find matching document with id: ${req.params.id}`);
+        res.status(404).send(`Unable to find matching document with id: ${id}`);
+        res.status(500).send("Internal Server Error");
     }
 };
 
@@ -198,6 +199,7 @@ export const deleteClass = async (req: Request, res: Response) => {
 
         if(!result){
             res.status(404).json({ message: `No class found with id ${id}` });
+            return;
         }
 
         const deleteResult=await classesCollection.deleteOne(query);
