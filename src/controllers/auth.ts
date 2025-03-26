@@ -53,6 +53,7 @@ export const handleLogin = async (req: Request, res: Response): Promise<any> => 
             id: user._id,
             name: user.name,
             email: user.email,
+            role: user?.role || 'user', 
           };
 
         const accessToken = createAccessToken(userPayload);

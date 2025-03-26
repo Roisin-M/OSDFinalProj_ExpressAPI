@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import { 
   JsonWebTokenError,
    verify as jwtVerify,
@@ -16,6 +16,8 @@ export const validJWTProvided = async (
 
       if (!authHeader || !authHeader?.startsWith('Bearer')) {
         console.log('no header ' + authHeader)
+        console.log("Auth header:", authHeader);
+
             res.status(401).json({ message: "Unauthorized: Missing token" });
             return;
       }
@@ -40,4 +42,24 @@ export const validJWTProvided = async (
             res.status(500).json({ message: "Internal server error" });
           }
         }
+    };
+    //middleware for role based authorisation for user and instructor
+    // export const requireRole = (role: 'user' | 'instructor') => {
+    //   return (req: Request, res: Response, next: NextFunction) => {
+    //     const authRole = res.locals?.payload?.role;
+    //     if (authRole !== role) {
+    //       return res.status(403).json({ message: `Access denied: requires ${role} role` });
+    //     }
+    //     next();
+    //   };
+    // }; 
+    export const requireRole = (role: 'user' | 'instructor'): RequestHandler => {
+      return (req, res, next) => {
+        const authRole = res.locals?.payload?.role;
+        if (authRole !== role) {
+          res.status(403).json({ message: `Access denied: requires ${role} role` });
+          return;
+        }
+        next();
+      };
     };

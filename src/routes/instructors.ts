@@ -7,14 +7,14 @@ import {
     updateInstructorPatch,
     updateInstructorPut,
 } from '../controllers/instructors';
-import { validJWTProvided } from '../middleware/auth.middleware';
+import { validJWTProvided, requireRole } from '../middleware/auth.middleware';
 const router: Router=express.Router();
 
 router.get('/',getInstructors);
 router.get('/:id',getInstructorById);
 router.post('/',createInstructor);
-router.put('/:id', validJWTProvided, updateInstructorPut);
-router.patch('/:id',updateInstructorPatch);
-router.delete('/:id',validJWTProvided, deleteInstructor);
+router.put('/:id', validJWTProvided, requireRole('instructor'), updateInstructorPut);
+router.patch('/:id',validJWTProvided, requireRole('instructor'),updateInstructorPatch);
+router.delete('/:id',validJWTProvided, requireRole('instructor'), deleteInstructor);
 
 export default router;

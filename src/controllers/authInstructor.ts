@@ -53,6 +53,7 @@ export const handleInstructorLogin = async (req: Request, res: Response): Promis
             id: instructor._id,
             name: instructor.name,
             email: instructor.email,
+            role: instructor?.role || 'instructor',
           };
 
         const accessToken = createAccessToken(instructorPayload);
@@ -79,7 +80,7 @@ const createAccessToken = (instructor: Instructor | null) : string  => {
         _id: instructor?.id, //include id to allow fetching of current id in angular app
         email: instructor?.email,
         name: instructor?.name,
-        role: instructor?.role || 'instructor'
+        role: instructor?.role || 'instructor',
     }
     const token = jwtSign(payload, secret, {expiresIn: parseInt(expiresTime.toString())}); 
 

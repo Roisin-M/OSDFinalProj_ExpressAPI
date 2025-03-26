@@ -1,4 +1,5 @@
 import express, {Router} from 'express';
+import { validJWTProvided, requireRole } from '../middleware/auth.middleware';
 import { 
     getClasses,
     getClassById,
@@ -11,9 +12,9 @@ import {
 
 router.get('/',getClasses);
 router.get('/:id',getClassById);
-router.post('/',createClass);
-router.put('/:id',updateClassPut);
-router.patch('/:id', updateClassPatch);
-router.delete('/:id',deleteClass);
+router.post('/', validJWTProvided, requireRole('instructor'), createClass);
+router.put('/:id', validJWTProvided, requireRole('instructor'), updateClassPut);
+router.patch('/:id',  validJWTProvided, requireRole('instructor'), updateClassPatch);
+router.delete('/:id', validJWTProvided, requireRole('instructor'), deleteClass);
 
 export default router;
