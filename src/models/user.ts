@@ -6,6 +6,7 @@ export default interface User{
     phonenumber?: string;
     email: string;
     id?: ObjectId;
+    role?: 'user'; //authroization to differentiate instructors and users
     password?: string;
     hashedPassword?: string;
     classIds?: ObjectId[]; // Array of Class IDs (references to classes) for many-to many relationship

@@ -3,6 +3,7 @@ import Instructor, { ValidateInstructor } from "../models/instructor";
 import { classesCollection, instructorsCollection } from "../database";
 import { ObjectId } from "mongodb";
 import Joi from "joi";
+import * as argon2 from 'argon2';
 
 //get all instructors
 export const getInstructors = async (req: Request, res:Response)=>{
@@ -71,12 +72,28 @@ export const createInstructor = async (req: Request, res: Response) => {
              return;
          }
 
+          //check if existing instructor
+        const existingUser = await instructorsCollection.findOne
+        ({email: req.body.email
+        });
+    
+        if (existingUser) {
+            res.status(400).json({"error": "existing email"});
+            return;
+        }
+
         // Create a new instructor object with dateJoined and lastUpdated set to current date
         const newInstructor: Instructor = {
             name,
             yogaSpecialities,
             email,
         };
+
+        //hashed password
+        newInstructor.hashedPassword = await argon2.hash(req.body.password)
+    
+        //console.log(newUser.hashedPassword)
+        delete newInstructor.password; // Remove plain text password from the insert
 
         // Insert the new instructor into the database
         const result = await instructorsCollection.insertOne(newInstructor);

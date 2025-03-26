@@ -37,3 +37,46 @@ content-type: application/json
 }
 ###
 @accessToken2 = {{login.response.body.accessToken}}
+
+# Instructor Login - Valid
+# @name loginInstructor
+POST {{endpoint}}/instructor HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "email@example.com",
+  "password": "@Hi12345"
+}
+###
+@instructorAccessToken = {{loginInstructor.response.body.accessToken}}
+
+# Instructor Login - Invalid Password
+# @name loginInstructorInvalidPassword
+POST {{endpoint}}/instructor HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "theemail@example.com",
+  "password": "WrongPass123!"
+}
+###
+# Expected: HTTP 401 Invalid email or password
+
+# Instructor Login - Nonexistent Email
+# @name loginInstructorNonexistent
+POST {{endpoint}}/instructor HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "nonexistent@example.com",
+  "password": "@Hi12345"
+}
+###
+# Expected: HTTP 401 Invalid email or password
+
+# Instructor Logout
+# @name logoutInstructor
+POST {{endpoint}}/instructor/logout HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{instructorAccessToken}}
+###

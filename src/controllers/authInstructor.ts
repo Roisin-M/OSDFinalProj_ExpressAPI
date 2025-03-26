@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { usersCollection } from "../database";
+import { instructorsCollection } from "../database";
 import * as argon2 from 'argon2';
 import {sign as jwtSign, verify as jwtVerify} from 'jsonwebtoken';
-import User  from '../models/user';
+import Instructor from '../models/instructor';
 
-export const handleLogin = async (req: Request, res: Response): Promise<any> => {
+export const handleInstructorLogin = async (req: Request, res: Response): Promise<any> => {
 
     const email = req.body?.email
     
@@ -16,7 +16,7 @@ export const handleLogin = async (req: Request, res: Response): Promise<any> => 
         .json({ message: 'Email and password are required' });
         return;
     }
-      const user = await usersCollection.findOne({
+      const instructor = await instructorsCollection.findOne({
         email: email.toLowerCase(),
       })
   
@@ -24,17 +24,17 @@ export const handleLogin = async (req: Request, res: Response): Promise<any> => 
       const dummyHash = await argon2.hash(dummyPassword);
     
       // Use the user's hash if found, otherwise use the dummy hash
-      let userPasswordHash;
+      let instructorPasswordHash;
 
-      if (user && user.hashedPassword){
-       userPasswordHash =  user.hashedPassword;
+      if (instructor && instructor.hashedPassword){
+       instructorPasswordHash =  instructor.hashedPassword;
       }
       else{
-         userPasswordHash = dummyHash;
+         instructorPasswordHash = dummyHash;
       }
     
       // check password
-        const isPasswordValid = await argon2.verify(userPasswordHash, password);
+        const isPasswordValid = await argon2.verify(instructorPasswordHash, password);
   
         // If password is invalid, return unauthorized
         if (!isPasswordValid) {
@@ -44,24 +44,24 @@ export const handleLogin = async (req: Request, res: Response): Promise<any> => 
           return;
         }
 
-        if (!user || !user.name || !user.email || !user._id) {
+        if (!instructor || !instructor.name || !instructor.email || !instructor._id) {
           return res.status(500).json({ message: 'User data is incomplete or invalid' });
         }
 
           // Construct token-safe payload
-          const userPayload = {
-            id: user._id,
-            name: user.name,
-            email: user.email,
+          const instructorPayload = {
+            id: instructor._id,
+            name: instructor.name,
+            email: instructor.email,
           };
 
-        const accessToken = createAccessToken(userPayload);
+        const accessToken = createAccessToken(instructorPayload);
 
         return res.status(201).json({ accessToken });
 
       }
 
-    export const handleLogout = async (req: Request, res: Response)=>{
+    export const handleInstructorLogout = async (req: Request, res: Response)=>{
         console.log("logout request received");
 
         //handled in client
@@ -69,17 +69,17 @@ export const handleLogin = async (req: Request, res: Response): Promise<any> => 
         .json({message: 'logout succesful'});
     };
 
-const createAccessToken = (user: User | null) : string  => {
+const createAccessToken = (instructor: Instructor | null) : string  => {
 
     const secret = process.env.JWTSECRET || "not very secret";
     const expiresTime = process.env.JWTEXPIRES || 60;
     console.log(expiresTime);
     const payload =
     {
-        _id: user?.id, //include id to allow fetching of current id in angular app
-        email: user?.email,
-        name: user?.name,
-        role: user?.role || 'user', 
+        _id: instructor?.id, //include id to allow fetching of current id in angular app
+        email: instructor?.email,
+        name: instructor?.name,
+        role: instructor?.role || 'instructor'
     }
     const token = jwtSign(payload, secret, {expiresIn: parseInt(expiresTime.toString())}); 
 
