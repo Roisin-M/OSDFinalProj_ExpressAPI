@@ -1,4 +1,5 @@
 @endpoint=http://localhost:3000/yoga-studio-management-api/v1/auth
+@endpointInstructor=http://localhost:3000/yoga-studio-management-api/v1/instructors
 
 # @name login
 POST {{endpoint}} HTTP/3.0
@@ -81,3 +82,8 @@ Content-Type: application/json
 Authorization: Bearer {{instructorAccessToken}}
 ###
 
+# @name getMyClasses
+GET {{endpointInstructor}}/67e43ffe6964c7241b2c5fcd/classes HTTP/1.1
+Authorization: Bearer {{instructorAccessToken}}
+Content-Type: application/json
+ ###

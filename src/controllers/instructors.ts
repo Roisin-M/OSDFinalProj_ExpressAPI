@@ -57,6 +57,29 @@ export const getInstructorById = async (req:Request,res:Response)=>{
         res.status(500).send("Internal Server Error");
     }
 };
+// get instructor by id and the assocated classes
+export const getInstructorClasses = async (req: Request, res: Response) => {
+    try {
+      const instructorId = req.params.id;
+  
+      if (!ObjectId.isValid(instructorId)) {
+        res.status(400).json({ message: "Invalid instructor ID" });
+        return;
+    }
+  
+      const classes = await classesCollection
+        .find({ instructorId: new ObjectId(instructorId) })
+        .sort({ date: 1 }) //sort by date
+        .toArray();
+  
+      res.status(200).json({ classes });
+    } catch (error) {
+      console.error("Error fetching instructor's classes:", error);
+      res.status(500).json({ message: "Failed to fetch classes for instructor" });
+    }
+  };
+  
+  
 
 // Create a new instructor
 export const createInstructor = async (req: Request, res: Response) => {
