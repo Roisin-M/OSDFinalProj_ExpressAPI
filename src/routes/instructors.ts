@@ -7,6 +7,7 @@ import {
     updateInstructorPatch,
     updateInstructorPut,
     getInstructorClasses,
+    getInstructorBookingCount
 } from '../controllers/instructors';
 import { validJWTProvided, requireRole } from '../middleware/auth.middleware';
 const router: Router=express.Router();
@@ -18,5 +19,7 @@ router.post('/',createInstructor);
 router.put('/:id', validJWTProvided, requireRole('instructor'), updateInstructorPut);
 router.patch('/:id',validJWTProvided, requireRole('instructor'),updateInstructorPatch);
 router.delete('/:id',validJWTProvided, requireRole('instructor'), deleteInstructor);
+router.get('/:id/numbookings', validJWTProvided, requireRole('instructor'), getInstructorBookingCount);
+
 
 export default router;

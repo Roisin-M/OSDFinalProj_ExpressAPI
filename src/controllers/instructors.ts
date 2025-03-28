@@ -79,6 +79,27 @@ export const getInstructorClasses = async (req: Request, res: Response) => {
     }
   };
   
+  //get booked classes
+  export const getInstructorBookingCount = async (req: Request, res: Response) => {
+    const instructorId = req.params.id;
+  
+    try {
+      const classes = await classesCollection.find({
+        instructorId: new ObjectId(instructorId)  
+      }).toArray();
+  
+      let totalBookings = 0;
+      for (let i = 0; i < classes.length; i++) {
+        totalBookings += (classes[i].userIds?.length || 0);
+      }
+  
+      res.status(200).json({ count: totalBookings });
+    } catch (error) {
+      console.error("Error counting bookings:", error);
+      res.status(500).json({ message: "Failed to count bookings" });
+    }
+  };
+  
   
 
 // Create a new instructor
